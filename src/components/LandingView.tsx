@@ -39,24 +39,52 @@ export function LandingView({
     <main className="view-panel landing-view">
       <section className="landing-shell">
         <div className="landing-copy">
-          <span className="eyebrow">{APP_COPY.eyebrow}</span>
-          <h1>{APP_COPY.landingTitle}</h1>
-          <p className="landing-lead">{APP_COPY.landingLead}</p>
-
-          <div className="landing-points">
-            {APP_COPY.landingPoints.map((item) => (
-              <span key={item} className="landing-pill">
-                {item}
-              </span>
-            ))}
+          <div className="landing-atmosphere" aria-hidden="true">
+            <div className="landing-nebula landing-nebula--gold" />
+            <div className="landing-nebula landing-nebula--blue" />
+            <div className="landing-starfield" />
+            <div className="landing-gridplane" />
+            <div className="landing-orbit-system">
+              <span className="landing-orbit landing-orbit--outer" />
+              <span className="landing-orbit landing-orbit--middle" />
+              <span className="landing-orbit landing-orbit--inner" />
+              <span className="landing-core" />
+              <span className="landing-satellite landing-satellite--one" />
+              <span className="landing-satellite landing-satellite--two" />
+            </div>
+            <div className="landing-signal landing-signal--one" />
+            <div className="landing-signal landing-signal--two" />
           </div>
 
-          <p className="landing-hint">{APP_COPY.landingHint}</p>
+          <div className="landing-copy-inner">
+            <span className="eyebrow">{APP_COPY.landingEyebrow}</span>
+
+            <div className="landing-title-group">
+              <h1>
+                {APP_COPY.landingTitleLines.map((line) => (
+                  <span key={line}>{line}</span>
+                ))}
+              </h1>
+              <p className="landing-lead">{APP_COPY.landingLead}</p>
+            </div>
+
+            <div className="landing-points">
+              {APP_COPY.landingPoints.map((item) => (
+                <span key={item} className="landing-pill">
+                  {item}
+                </span>
+              ))}
+            </div>
+
+            <p className="landing-hint">{APP_COPY.landingHint}</p>
+          </div>
+
+          <small className="landing-brand-signature">{APP_COPY.landingBrandSignature}</small>
         </div>
 
         <aside className="form-panel">
           <div className="section-heading">
-            <span className="section-kicker">出生資料</span>
+            <span className="section-kicker">{APP_COPY.formKicker}</span>
             <h2>{APP_COPY.formTitle}</h2>
             <p>{APP_COPY.formLead}</p>
           </div>

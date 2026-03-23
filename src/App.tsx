@@ -13,7 +13,7 @@ function App() {
   const experience = useChartExperience({ prefersReducedMotion })
   const today = getTaiwanToday()
 
-  const showTopbar = experience.view === 'landing' || experience.view === 'story' || experience.view === 'premium'
+  const showTopbar = experience.view === 'story' || experience.view === 'premium'
 
   return (
     <div className={`page-shell ${experience.view === 'premium' ? 'page-shell--light' : ''}`}>

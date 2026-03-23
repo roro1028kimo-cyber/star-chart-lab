@@ -221,6 +221,7 @@ function normalizeBody(body: SupportedHoroscopeBody): PlanetPlacement {
     sign: toShortSign(body.Sign.key),
     signLabel: toChineseSign(body.Sign.key, body.Sign.label),
     degree: toSignDegree(body.ChartPosition.Ecliptic.DecimalDegrees),
+    formattedDegree: body.ChartPosition.Ecliptic.ArcDegreesFormatted30,
     absDegree: body.ChartPosition.Ecliptic.DecimalDegrees,
     house: body.House.id,
     houseLabel: getHouseLabel(body.House.id),
@@ -234,6 +235,7 @@ function normalizeHouse(house: HoroscopeResult['Houses'][number]): HousePlacemen
     sign: toShortSign(house.Sign.key),
     signLabel: toChineseSign(house.Sign.key, house.Sign.label),
     degree: toSignDegree(house.ChartPosition.StartPosition.Ecliptic.DecimalDegrees),
+    formattedDegree: house.ChartPosition.StartPosition.Ecliptic.ArcDegreesFormatted30,
     absDegree: house.ChartPosition.StartPosition.Ecliptic.DecimalDegrees,
   }
 }
@@ -330,12 +332,14 @@ export async function calculateNatalChart(input: NatalChartInput): Promise<Natal
       sign: toShortSign(horoscope.Ascendant.Sign.key),
       signLabel: toChineseSign(horoscope.Ascendant.Sign.key, horoscope.Ascendant.Sign.label),
       degree: toSignDegree(horoscope.Ascendant.ChartPosition.Ecliptic.DecimalDegrees),
+      formattedDegree: horoscope.Ascendant.ChartPosition.Ecliptic.ArcDegreesFormatted30,
       absDegree: horoscope.Ascendant.ChartPosition.Ecliptic.DecimalDegrees,
     },
     midheaven: {
       sign: toShortSign(horoscope.Midheaven.Sign.key),
       signLabel: toChineseSign(horoscope.Midheaven.Sign.key, horoscope.Midheaven.Sign.label),
       degree: toSignDegree(horoscope.Midheaven.ChartPosition.Ecliptic.DecimalDegrees),
+      formattedDegree: horoscope.Midheaven.ChartPosition.Ecliptic.ArcDegreesFormatted30,
       absDegree: horoscope.Midheaven.ChartPosition.Ecliptic.DecimalDegrees,
     },
     dominantElement: dominantElement?.[0] || 'Earth',

@@ -14,6 +14,7 @@ export interface PlanetPlacement {
   sign: string
   signLabel: string
   degree: number
+  formattedDegree: string
   absDegree: number
   house: number
   houseLabel: string
@@ -25,6 +26,7 @@ export interface HousePlacement {
   sign: string
   signLabel: string
   degree: number
+  formattedDegree: string
   absDegree: number
 }
 
@@ -63,12 +65,14 @@ export interface NatalChartResult {
       sign: string
       signLabel: string
       degree: number
+      formattedDegree: string
       absDegree: number
     }
     midheaven: {
       sign: string
       signLabel: string
       degree: number
+      formattedDegree: string
       absDegree: number
     }
     dominantElement: string
