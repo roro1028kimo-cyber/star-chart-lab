@@ -1,3 +1,28 @@
+# 2026-03-23 19:18:00
+
+## 本次任務
+- 檢查哥哥補好的 `.env` 是否存在且可供本地 server 使用，並修掉 build 畫面中 `loadForecast` 宣告順序造成的 TypeScript 錯誤後上推 GitHub。
+## 需求理解
+- 錯誤畫面明確指出 [src/hooks/useChartExperience.ts](C:/codex/star-chart-lab/src/hooks/useChartExperience.ts) 在 `useEffect` 內先使用了 `loadForecast`，需要直接修正對應位置，不擴大修改範圍。
+- `.env` 只需要確認已補齊且存在，不可把真實 API key 寫入版本控制或日誌。
+## 計畫
+- 先確認專案規則與目前工作區狀態。
+- 修正 `loadForecast` 的初始化順序。
+- 執行 `npm run lint` 與 `npm run build` 驗證。
+- 補記錄後 commit、push。
+## 哥哥確認
+- 哥哥要求先查看 `.env`，並直接處理錯誤位置後上推。
+## 實際執行
+- 確認本地 `.env` 存在，且 `AI_PROVIDER`、`OPENAI_API_KEY`、`OPENAI_MODEL`、`GEMINI_API_KEY`、`GEMINI_MODEL` 皆已有值，但未讀取或外洩實際內容。
+- 將 [src/hooks/useChartExperience.ts](C:/codex/star-chart-lab/src/hooks/useChartExperience.ts) 中呼叫 `loadForecast` 的 `useEffect` 移到 `const loadForecast = useCallback(...)` 之後，避免 block-scoped variable 在宣告前被使用。
+- 重新執行 `npm run lint` 與 `npm run build`，兩者皆通過。
+## 遇到的問題
+- 這次錯誤屬於 React Hook 宣告順序問題，不是 API 或 env 設定錯誤。
+## 目前狀態
+- 修正已完成，待提交並推上 GitHub。
+## 下一步
+- 若哥哥要繼續第三段工程，就接著做 forecast 歷史查詢與自動排程。
+
 # 2026-03-23 19:06:52
 
 ## 本次任務

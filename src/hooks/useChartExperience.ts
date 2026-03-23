@@ -118,30 +118,6 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
     }
   }, [pendingSection, prefersReducedMotion, view])
 
-  useEffect(() => {
-    if (!chart || view === 'landing' || view === 'entry-transition') {
-      return
-    }
-
-    if (!yearlyForecast && !yearlyForecastLoading && !yearlyForecastError) {
-      void loadForecast('yearly')
-    }
-
-    if (!weeklyForecast && !weeklyForecastLoading && !weeklyForecastError) {
-      void loadForecast('weekly')
-    }
-  }, [
-    chart,
-    loadForecast,
-    view,
-    yearlyForecast,
-    weeklyForecast,
-    yearlyForecastLoading,
-    weeklyForecastLoading,
-    yearlyForecastError,
-    weeklyForecastError,
-  ])
-
   function handlePlaceQueryChange(nextValue: string) {
     setPlaceQuery(nextValue)
     setSelectedPlace(null)
@@ -192,6 +168,30 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
       setLoading(false)
     }
   }, [chart])
+
+  useEffect(() => {
+    if (!chart || view === 'landing' || view === 'entry-transition') {
+      return
+    }
+
+    if (!yearlyForecast && !yearlyForecastLoading && !yearlyForecastError) {
+      void loadForecast('yearly')
+    }
+
+    if (!weeklyForecast && !weeklyForecastLoading && !weeklyForecastError) {
+      void loadForecast('weekly')
+    }
+  }, [
+    chart,
+    loadForecast,
+    view,
+    yearlyForecast,
+    weeklyForecast,
+    yearlyForecastLoading,
+    weeklyForecastLoading,
+    yearlyForecastError,
+    weeklyForecastError,
+  ])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
