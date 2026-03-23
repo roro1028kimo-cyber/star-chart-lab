@@ -29,54 +29,50 @@ function formatPlanetLine(chart: NatalChartResult, key: (typeof PROMPT_PLANET_OR
   const planet = chart.planets.find((item) => item.key === key)
 
   if (!planet) {
-    throw new Error(`AI prompt 建立失敗：找不到 ${label} 的盤面資料。`)
+    throw new Error(`AI prompt 缺少 ${label} 的命盤資料。`)
   }
 
-  return `${label}：${planet.signLabel} 第${planet.house}宮 ${formatDegree(planet.degree)}°${planet.retrograde ? ' 逆行' : ''}`
+  return `${label}：${planet.signLabel}、${planet.houseLabel}、${formatDegree(planet.degree)}°${planet.retrograde ? '、逆行' : ''}`
 }
 
 function buildPrompt(chart: NatalChartResult) {
   const analysisYear = getAnalysisYear()
-
   const planetSummary = PROMPT_PLANET_ORDER.map((planet) => formatPlanetLine(chart, planet.key, planet.label)).join('\n')
-
   const aspectSummary = chart.aspects
     .slice(0, 5)
     .map((aspect) => `${aspect.planet1} / ${aspect.planet2}：${aspect.aspect}（orb ${aspect.orb.toFixed(2)}°）`)
     .join('\n')
 
-  return `你是一位擅長把西洋占星翻成可讀人生說明書的分析師，風格誠實、銳利、有溫度，不說空話。
+  return `你是一位擅長西洋占星本命盤解讀的占星內容編輯，請根據以下資料，寫出一篇繁體中文、可直接給使用者閱讀的長版命盤分析。
 
-你的任務是根據使用者的星盤資料，輸出一份適合放在「白底黑字個人檔案頁」上的完整個人分析。
+請遵守：
+1. 只用繁體中文。
+2. 不要條列資料回填，要像人寫的完整分析。
+3. 語氣要深度、清楚、有畫面，但不要神神叨叨。
+4. 內容長度控制在 700 到 1200 字。
+5. 內容需包含：人格核心、情感模式、工作天賦、近期成長提醒。
+6. 不要虛構使用者沒有提供的事件。
 
-【星盤資料】
+命盤摘要：
 ${planetSummary}
 
-【補充參考】
 上升：${chart.summary.ascendant.signLabel} ${formatDegree(chart.summary.ascendant.degree)}°
-最緊密相位：
-${aspectSummary || '無'}
+天頂：${chart.summary.midheaven.signLabel} ${formatDegree(chart.summary.midheaven.degree)}°
+主能量：${chart.summary.dominantElement} / ${chart.summary.dominantModality}
 
-【分析年份】${analysisYear}
+主要相位：
+${aspectSummary || '無明顯主要相位資料'}
 
-【輸出格式】
-請直接用繁體中文輸出，使用以下標題順序，不要加前言、免責聲明、方法說明，也不要使用 markdown 表格：
+已知規則式解讀可作為基礎，但請重新整合成一篇自然流暢的長文：
+標題：${chart.interpretation.headline}
+短摘要：${chart.interpretation.subheadline}
+免費短讀：
+${chart.interpretation.freeReading}
 
-1. 個性核心
-2. 目前的人生節奏
-3. 關係與情感模式
-4. 工作天賦與消耗點
-5. ${analysisYear} 年提醒
-6. 一句人生建議
+段落參考：
+${chart.interpretation.sections.map((section) => `${section.title}：${section.body}`).join('\n')}
 
-【寫作要求】
-- 全文 700 到 1200 字
-- 第二人稱統一使用「你」
-- 每一節都要盡量對應具體的行星、宮位或相位
-- 不要只說優點，必須寫出真實弱點、拖延點、盲點或容易卡住的地方
-- 語氣像一個看得懂你的人在直接對你說話，不要像教科書
-- 請把文字寫成連續可閱讀的段落，不要輸出條列符號
-- 「一句人生建議」請單獨成段，控制在 40 字內，直接、有力、像收尾提醒`
+分析年份：${analysisYear}`
 }
 
 async function generateWithOpenAI(prompt: string) {
@@ -117,7 +113,7 @@ async function generateWithOpenAI(prompt: string) {
   }
 
   if (!response.ok) {
-    throw new Error(payload?.error?.message || 'OpenAI 產生失敗。')
+    throw new Error(payload?.error?.message || 'OpenAI 回應失敗。')
   }
 
   const text =
@@ -133,8 +129,8 @@ async function generateWithOpenAI(prompt: string) {
   if (!text) {
     throw new Error(
       payload.incomplete_details?.reason === 'max_output_tokens'
-        ? 'OpenAI 回應被推理內容吃掉了，尚未產出可讀文字。'
-        : 'OpenAI 已回應，但沒有產出可讀文字。',
+        ? 'OpenAI 輸出被 token 上限截斷，請調高輸出長度。'
+        : 'OpenAI 沒有回傳有效內容。',
     )
   }
 
@@ -176,17 +172,17 @@ async function generateWithGemini(prompt: string) {
   }
 
   if (!response.ok) {
-    throw new Error(payload?.error?.message || 'Gemini 產生失敗。')
+    throw new Error(payload?.error?.message || 'Gemini 回應失敗。')
   }
 
-  return payload?.candidates?.[0]?.content?.parts?.map((part: { text?: string }) => part.text || '').join('\n') || ''
+  return payload?.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('\n') || ''
 }
 
 export async function generateAiAdvice(chart: NatalChartResult) {
   const provider = getPreferredAiProvider()
 
   if (!provider) {
-    throw new Error('尚未設定 AI API key。')
+    throw new Error('目前尚未設定 AI API 金鑰。')
   }
 
   const prompt = buildPrompt(chart)

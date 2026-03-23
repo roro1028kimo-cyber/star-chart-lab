@@ -86,6 +86,8 @@ export interface NatalChartResult {
     subheadline: string
     keywords: string[]
     highlights: string[]
+    freeReading: string
+    premiumTeaser: string
     sections: InterpretationBlock[]
   }
 }

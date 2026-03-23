@@ -598,3 +598,44 @@
 
 ## 目前狀態
 - Zeabur 部署補強進行中。
+# 2026-03-23 15:26:03
+
+## 本次任務
+- 重新規劃前端設計，重做「首頁 >> 過場動畫 >> 次頁 >> 過場動畫 >> 付費頁面」流程。
+
+## 理解到的需求
+- App 目前把狀態、流程、畫面都包在 `App.tsx`，需要拆成輕量化結構。
+- 兩段過場動畫要更有互動感，而不是只做被動播放。
+- 資料流要變成「首頁星盤 -> 初次依照星盤分析 50-300 字 -> 付費頁面依照星盤分析 500-3000 字」。
+- 初次星盤文案要參考 `C:\Users\A1257\.claude\skills\viral-copywriting\viral-copywriting.md` 的寫法。
+- 未使用元件或資產可以刪除。
+- 完成後直接 commit 並推上 GitHub。
+
+## 提出的計畫
+- 先整理前後端型別，讓免費短讀與付費長讀都有明確欄位。
+- 將 `App.tsx` 改為只負責組裝頁面，搜尋、命盤請求、轉場控制搬到 hooks。
+- 重寫 landing、次頁、付費頁與兩段互動式 transition 元件。
+- 清除未使用元件/資產，最後做 build、lint 與資料 smoke test。
+
+## 哥哥確認結果
+- 哥哥同意直接開始做，並要求做完後直接推上 GitHub。
+
+## 實際執行內容
+- 重寫前端流程與 UI，新增 `Topbar`、`LandingView`、`StoryView`、`PremiumView`、`InteractiveTransition`。
+- 新增 `useChartExperience`、`useMotionPreference`，把搜尋、命盤生成、頁面切換與轉場時序從 `App.tsx` 移出。
+- 重寫 `src/App.css` 與 `src/index.css`，改為統一的深色星體檔案室視覺系統。
+- 調整後端 `interpretation` 結構，新增 `freeReading`、`premiumTeaser`，並把長文段落整理成可直接供付費頁使用的 sections。
+- 依照 viral copywriting 參考檔案，做出首版規則式免費短讀。
+- 重寫 `server/services/thoth.ts`、`server/services/interpretation.ts`、`server/services/ai.ts`，順手清掉原本殘留的亂碼文案。
+- 刪除未使用的 `src/components/RevealSection.tsx`、`src/assets/react.svg`、`src/assets/vite.svg`。
+
+## 驗證結果
+- `npm run build`：通過
+- `npm run lint`：通過
+- 以台北座標做 smoke test，確認 `freeReading` 與長版 `sections` 皆有正常產出。
+
+## 目前狀態
+- 功能與畫面已完成第一輪重構，待 commit 與 push。
+
+## 下一步
+- 建立 commit，推上 GitHub。

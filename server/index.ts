@@ -37,7 +37,7 @@ app.get('/api/health', async (_request, response) => {
       await prisma.$queryRaw`SELECT 1`
       databaseConnected = true
     } catch (error) {
-      databaseError = error instanceof Error ? error.message : '資料庫連線檢查失敗。'
+      databaseError = error instanceof Error ? error.message : '資料庫檢查失敗。'
     }
   }
 
@@ -64,7 +64,7 @@ app.get('/api/places/search', async (request, response) => {
     response.json(suggestions)
   } catch (error) {
     response.status(500).json({
-      error: error instanceof Error ? error.message : '地點搜尋失敗。',
+      error: error instanceof Error ? error.message : '地點搜尋暫時失敗。',
     })
   }
 })
@@ -85,7 +85,7 @@ app.post('/api/charts/natal', async (request, response) => {
     response.json(result)
   } catch (error) {
     response.status(500).json({
-      error: error instanceof Error ? error.message : '本命盤計算失敗。',
+      error: error instanceof Error ? error.message : '命盤生成失敗。',
     })
   }
 })
@@ -95,14 +95,14 @@ app.post('/api/insights/ai', async (request, response) => {
 
   if (!parsed.success) {
     response.status(400).json({
-      error: 'AI 建議請求格式不正確。',
+      error: 'AI 分析請求格式不正確。',
     })
     return
   }
 
   if (!getPreferredAiProvider()) {
     response.status(503).json({
-      error: '尚未設定 AI API key，請先填入 .env 後再啟用 AI 建議。',
+      error: '目前尚未設定 AI API 金鑰，請先補上 .env 後再啟用 AI 分析。',
     })
     return
   }
@@ -115,7 +115,7 @@ app.post('/api/insights/ai', async (request, response) => {
     })
   } catch (error) {
     response.status(500).json({
-      error: error instanceof Error ? error.message : 'AI 建議生成失敗。',
+      error: error instanceof Error ? error.message : 'AI 分析暫時失敗。',
     })
   }
 })

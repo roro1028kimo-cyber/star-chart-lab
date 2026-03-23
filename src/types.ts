@@ -35,6 +35,11 @@ export interface AspectSummary {
   orb: number
 }
 
+export interface InterpretationBlock {
+  title: string
+  body: string
+}
+
 export interface NatalChartResult {
   input: {
     date: string
@@ -79,27 +84,8 @@ export interface NatalChartResult {
     subheadline: string
     keywords: string[]
     highlights: string[]
-    sections: Array<{
-      title: string
-      body: string
-    }>
+    freeReading: string
+    premiumTeaser: string
+    sections: InterpretationBlock[]
   }
-}
-
-export interface HealthResponse {
-  ok: boolean
-  aiConfigured: boolean
-  aiProvider: string | null
-}
-
-export interface AiInsightsResponse {
-  advice: string
-  provider: string | null
-}
-
-export interface PremiumEmailPlaceholderResponse {
-  ok: boolean
-  ready: boolean
-  endpoint: string
-  error: string
 }

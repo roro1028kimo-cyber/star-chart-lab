@@ -1,25 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&family=Space+Grotesk:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap');
 
 :root {
-  --bg: #07111b;
-  --bg-deep: #04070f;
-  --paper: #f6ecdf;
-  --paper-ink: #22160f;
-  --text-strong: #f6efe5;
-  --text-soft: #d7c8b8;
-  --text-muted: #94a0b0;
-  --accent: #d2a56a;
-  --accent-strong: #f3cf9d;
-  --accent-cool: #9eb6d6;
-  --danger: #ffc4b9;
-  --shadow-deep: 0 36px 90px rgba(0, 0, 0, 0.42);
-  --shadow-soft: 0 24px 64px rgba(0, 0, 0, 0.28);
+  --bg: #07111a;
+  --bg-deep: #040910;
+  --surface: rgba(11, 20, 32, 0.88);
+  --surface-soft: rgba(255, 255, 255, 0.05);
+  --surface-light: #f7f4ed;
+  --surface-light-soft: rgba(12, 18, 28, 0.05);
+  --text-strong: #f6efe7;
+  --text-soft: #d7c7b6;
+  --text-muted: #92a0af;
+  --text-ink: #14151b;
+  --accent: #d5ac73;
+  --accent-strong: #f4d8a3;
+  --accent-cool: #8cb0d9;
+  --danger: #ffc6bb;
+  --shadow-deep: 0 30px 90px rgba(0, 0, 0, 0.34);
+  --shadow-soft: 0 18px 54px rgba(0, 0, 0, 0.22);
   font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
   color: var(--text-soft);
-  background:
-    radial-gradient(circle at top left, rgba(210, 165, 106, 0.18), transparent 24%),
-    radial-gradient(circle at 78% 12%, rgba(158, 182, 214, 0.14), transparent 28%),
-    linear-gradient(180deg, #0b1220 0%, #060a12 100%);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -38,8 +37,11 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background:
+    radial-gradient(circle at 14% 18%, rgba(213, 172, 115, 0.18), transparent 22%),
+    radial-gradient(circle at 82% 10%, rgba(140, 176, 217, 0.18), transparent 28%),
+    linear-gradient(180deg, #0b1320 0%, #060a10 100%);
   color: var(--text-soft);
-  background: transparent;
 }
 
 body::before,
@@ -56,16 +58,16 @@ body::before {
     radial-gradient(circle at 84% 10%, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px),
     radial-gradient(circle at 38% 74%, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px),
     radial-gradient(circle at 88% 70%, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px);
-  opacity: 0.44;
+  opacity: 0.42;
 }
 
 body::after {
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-  background-size: 72px 72px;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.22), transparent 70%);
-  opacity: 0.3;
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 84px 84px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.28), transparent 72%);
+  opacity: 0.28;
 }
 
 button,
@@ -82,13 +84,13 @@ h2,
 h3,
 h4 {
   margin: 0;
-  font-family: 'Cormorant Garamond', 'Noto Serif TC', serif;
   color: var(--text-strong);
+  font-family: 'Cormorant Garamond', 'Noto Sans TC', serif;
 }
 
 p {
   margin: 0;
-  line-height: 1.68;
+  line-height: 1.7;
 }
 
 small {

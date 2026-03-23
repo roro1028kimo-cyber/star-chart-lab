@@ -144,22 +144,7 @@ const PLANET_LABELS: Record<string, string> = {
   chiron: '凱龍星',
   northnode: '北交點',
   southnode: '南交點',
-  lilith: '莉莉絲',
-}
-
-const HOUSE_LABELS: Record<number, string> = {
-  1: '第一宮',
-  2: '第二宮',
-  3: '第三宮',
-  4: '第四宮',
-  5: '第五宮',
-  6: '第六宮',
-  7: '第七宮',
-  8: '第八宮',
-  9: '第九宮',
-  10: '第十宮',
-  11: '第十一宮',
-  12: '第十二宮',
+  lilith: '黑月莉莉絲',
 }
 
 const SUPPORTED_BODY_KEYS = new Set([
@@ -218,7 +203,7 @@ function toChineseSign(signKey: string, fallbackLabel: string) {
 }
 
 function getHouseLabel(houseNumber: number) {
-  return HOUSE_LABELS[houseNumber] || `第${houseNumber}宮`
+  return `第${houseNumber}宮`
 }
 
 function isSupportedBody(body: HoroscopeBody): body is SupportedHoroscopeBody {
@@ -255,8 +240,8 @@ function normalizeHouse(house: HoroscopeResult['Houses'][number]): HousePlacemen
 
 function normalizeAspect(aspect: HoroscopeAspect): AspectSummary {
   return {
-    planet1: aspect.point1Label,
-    planet2: aspect.point2Label,
+    planet1: PLANET_LABELS[aspect.point1Key] || aspect.point1Label,
+    planet2: PLANET_LABELS[aspect.point2Key] || aspect.point2Label,
     aspect: aspect.aspectKey || aspect.label.toLowerCase(),
     orb: aspect.orb,
   }
@@ -269,9 +254,11 @@ function pickDominant(record: Record<string, number>) {
 function countElements(planets: PlanetPlacement[]) {
   return planets.reduce<Record<string, number>>((accumulator, planet) => {
     const meta = Object.values(SIGN_META).find((item) => item.short === planet.sign)
+
     if (meta) {
       accumulator[meta.element] = (accumulator[meta.element] || 0) + 1
     }
+
     return accumulator
   }, {})
 }
@@ -279,9 +266,11 @@ function countElements(planets: PlanetPlacement[]) {
 function countModalities(planets: PlanetPlacement[]) {
   return planets.reduce<Record<string, number>>((accumulator, planet) => {
     const meta = Object.values(SIGN_META).find((item) => item.short === planet.sign)
+
     if (meta) {
       accumulator[meta.modality] = (accumulator[meta.modality] || 0) + 1
     }
+
     return accumulator
   }, {})
 }
@@ -325,7 +314,7 @@ export async function calculateNatalChart(input: NatalChartInput): Promise<Natal
   const moon = planets.find((planet) => planet.key === 'moon')
 
   if (!sun || !moon) {
-    throw new Error('本命盤計算失敗：找不到太陽或月亮的落點。')
+    throw new Error('系統無法從命盤結果中取得太陽與月亮資料。')
   }
 
   const dominantPlanets = planets.filter((planet) => DOMINANT_BODY_KEYS.has(planet.key))
@@ -371,7 +360,6 @@ export async function calculateNatalChart(input: NatalChartInput): Promise<Natal
       input,
       summary,
       planets,
-      houses,
       aspects,
     }),
   }

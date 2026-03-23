@@ -45,7 +45,7 @@ export function ChartWheel({
   const majorPlanets = planets.filter((planet) => PLANET_SHORT[planet.key])
 
   return (
-    <svg className="chart-wheel" viewBox={`0 0 ${size} ${size}`} role="img" aria-label="Natal chart wheel">
+    <svg className="chart-wheel" viewBox={`0 0 ${size} ${size}`} role="img" aria-label="本命盤圓盤">
       <defs>
         <radialGradient id="wheelGlow" cx="50%" cy="50%" r="60%">
           <stop offset="0%" stopColor="rgba(255,255,255,0.88)" />
