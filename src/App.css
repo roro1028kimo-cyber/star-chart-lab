@@ -1139,6 +1139,287 @@
   color: rgba(20, 21, 27, 0.72);
 }
 
+.dashboard-view,
+.tarot-view {
+  min-height: calc(100vh - 48px);
+}
+
+.dashboard-shell {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr) 300px;
+  gap: 20px;
+  align-items: start;
+}
+
+.dashboard-sidebar,
+.dashboard-header,
+.dashboard-stage__chart,
+.dashboard-stage__reading,
+.dashboard-focus-card,
+.dashboard-rail__card,
+.tarot-header,
+.tarot-stage,
+.tarot-sidebar__card {
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow-soft);
+  background:
+    linear-gradient(180deg, rgba(12, 19, 32, 0.92), rgba(8, 13, 24, 0.98)),
+    rgba(255, 255, 255, 0.02);
+}
+
+.dashboard-sidebar {
+  position: sticky;
+  top: 24px;
+  display: grid;
+  gap: 22px;
+  padding: 24px 20px;
+}
+
+.dashboard-sidebar__brand {
+  display: grid;
+  gap: 8px;
+}
+
+.dashboard-sidebar__brand strong {
+  color: var(--text-strong);
+  font-size: 1.12rem;
+  letter-spacing: 0.16em;
+}
+
+.dashboard-nav {
+  display: grid;
+  gap: 10px;
+}
+
+.dashboard-nav__button {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-strong);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.dashboard-nav__button span {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.dashboard-nav__button.is-active,
+.dashboard-nav__button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(244, 216, 163, 0.24);
+  background: rgba(244, 216, 163, 0.08);
+}
+
+.dashboard-sidebar__home {
+  width: 100%;
+  justify-content: center;
+}
+
+.dashboard-main,
+.dashboard-stage,
+.dashboard-rail,
+.tarot-shell,
+.tarot-sidebar {
+  display: grid;
+  gap: 20px;
+}
+
+.dashboard-header {
+  padding: 26px 28px;
+}
+
+.dashboard-header h1,
+.tarot-header h1 {
+  font-size: clamp(2.5rem, 4.6vw, 4.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+}
+
+.dashboard-stage__chart,
+.dashboard-stage__reading,
+.dashboard-focus-card {
+  padding: 24px;
+}
+
+.dashboard-stage__layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.96fr) minmax(0, 1.04fr);
+  gap: 22px;
+  align-items: center;
+  margin-top: 22px;
+}
+
+.dashboard-copy-block {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.house-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 18px 0 22px;
+}
+
+.house-impact-card,
+.settings-item {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.house-impact-card strong,
+.settings-item strong {
+  color: var(--text-strong);
+}
+
+.house-impact-card span,
+.settings-item span {
+  color: var(--text-soft);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.settings-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.vip-lock-panel {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dashboard-rail__card {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+}
+
+.dashboard-rail__card h3,
+.tarot-sidebar__card h3,
+.tarot-card h2 {
+  margin: 0;
+  color: var(--text-strong);
+  font-family: 'Cormorant Garamond', 'Noto Sans TC', serif;
+  font-size: 1.6rem;
+  line-height: 1.04;
+}
+
+.dashboard-rail__card p,
+.house-impact-card small,
+.tarot-header p,
+.tarot-sidebar__card p,
+.tarot-card small {
+  color: var(--text-muted);
+}
+
+.tarot-header {
+  padding: 24px 28px;
+}
+
+.tarot-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tarot-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 20px;
+}
+
+.tarot-stage {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 0.8fr);
+  gap: 24px;
+  align-items: center;
+  padding: 24px;
+}
+
+.tarot-circle {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, rgba(140, 176, 217, 0.18), transparent 48%),
+    radial-gradient(circle at center, rgba(244, 216, 163, 0.16), transparent 66%);
+}
+
+.tarot-circle__ring,
+.tarot-circle__core {
+  position: absolute;
+  inset: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tarot-circle__ring {
+  border: 1px solid rgba(244, 216, 163, 0.18);
+}
+
+.tarot-circle__ring--outer {
+  width: 100%;
+  height: 100%;
+}
+
+.tarot-circle__ring--middle {
+  width: 70%;
+  height: 70%;
+  border-color: rgba(140, 176, 217, 0.22);
+}
+
+.tarot-circle__ring--inner {
+  width: 38%;
+  height: 38%;
+}
+
+.tarot-circle__core {
+  width: 16px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 0 24px rgba(255, 255, 255, 0.9),
+    0 0 56px rgba(244, 216, 163, 0.28);
+}
+
+.tarot-card {
+  display: grid;
+  gap: 14px;
+}
+
+.tarot-card p {
+  color: rgba(246, 239, 231, 0.84);
+}
+
+.tarot-sidebar__card {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+}
+
 .wheel-outer {
   stroke: rgba(244, 216, 163, 0.34);
   stroke-width: 1.5;
@@ -1312,6 +1593,12 @@
     grid-template-columns: 1fr;
   }
 
+  .dashboard-shell,
+  .tarot-layout,
+  .tarot-stage {
+    grid-template-columns: 1fr;
+  }
+
   .form-panel {
     position: static;
   }
@@ -1331,6 +1618,16 @@
   .premium-card--chart,
   .premium-card--sidebar {
     grid-column: span 12;
+  }
+
+  .dashboard-sidebar {
+    position: static;
+  }
+
+  .dashboard-stage__layout,
+  .settings-list,
+  .house-impact-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1354,7 +1651,16 @@
   .form-panel,
   .story-hero,
   .story-card,
-  .premium-card {
+  .premium-card,
+  .dashboard-header,
+  .dashboard-stage__chart,
+  .dashboard-stage__reading,
+  .dashboard-focus-card,
+  .dashboard-sidebar,
+  .dashboard-rail__card,
+  .tarot-header,
+  .tarot-stage,
+  .tarot-sidebar__card {
     padding: 20px;
   }
 
@@ -1402,6 +1708,10 @@
 
   .placement-table table {
     min-width: 540px;
+  }
+
+  .dashboard-shell {
+    gap: 16px;
   }
 }
 

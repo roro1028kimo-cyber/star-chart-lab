@@ -1,10 +1,9 @@
 import './App.css'
 import { APP_COPY, getTaiwanToday } from './content'
+import { DashboardView } from './components/DashboardView'
 import { InteractiveTransition } from './components/InteractiveTransition'
 import { LandingView } from './components/LandingView'
-import { PremiumView } from './components/PremiumView'
-import { StoryView } from './components/StoryView'
-import { Topbar } from './components/Topbar'
+import { TarotView } from './components/TarotView'
 import { useChartExperience } from './hooks/useChartExperience'
 import { useMotionPreference } from './hooks/useMotionPreference'
 
@@ -14,10 +13,8 @@ function App() {
   const today = getTaiwanToday()
   const isTransitionView = experience.view === 'entry-transition' || experience.view === 'premium-transition'
 
-  const showTopbar = experience.view === 'story' || experience.view === 'premium'
   const shellClassName = [
     'page-shell',
-    experience.view === 'premium' ? 'page-shell--light' : '',
     isTransitionView ? 'page-shell--transition' : '',
   ]
     .filter(Boolean)
@@ -25,8 +22,6 @@ function App() {
 
   return (
     <div className={shellClassName}>
-      {showTopbar && <Topbar />}
-
       {experience.view === 'landing' && (
         <LandingView
           chartError={experience.chartError}
@@ -56,8 +51,16 @@ function App() {
         />
       )}
 
-      {experience.view === 'story' && experience.chart && (
-        <StoryView chart={experience.chart} onOpenPremium={experience.openPremium} onReset={experience.resetToLanding} />
+      {experience.view === 'dashboard' && experience.chart && (
+        <DashboardView
+          activeSection={experience.activeSection}
+          chart={experience.chart}
+          onBackHome={experience.resetToLanding}
+          onOpenPremium={experience.openPremium}
+          onOpenTarot={experience.openTarot}
+          onSelectSection={experience.selectSection}
+          vipUnlocked={experience.vipUnlocked}
+        />
       )}
 
       {experience.view === 'premium-transition' && (
@@ -69,11 +72,11 @@ function App() {
         />
       )}
 
-      {experience.view === 'premium' && experience.chart && (
-        <PremiumView
+      {experience.view === 'tarot' && experience.chart && (
+        <TarotView
           chart={experience.chart}
           onBackHome={experience.resetToLanding}
-          onBackStory={experience.backToStory}
+          onBackDashboard={experience.backToDashboard}
         />
       )}
     </div>

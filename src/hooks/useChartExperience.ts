@@ -1,13 +1,13 @@
 import { startTransition, useDeferredValue, useEffect, useState, type FormEvent } from 'react'
 import { APP_COPY } from '../content'
-import type { NatalChartResult, PlaceSuggestion } from '../types'
+import type { DashboardSection, NatalChartResult, PlaceSuggestion } from '../types'
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
 const MIN_LOADING_MS = 1200
 const ENTRY_TRANSITION_MS = 2200
 const PREMIUM_TRANSITION_MS = 1800
 
-export type ViewState = 'landing' | 'entry-transition' | 'story' | 'premium-transition' | 'premium'
+export type ViewState = 'landing' | 'entry-transition' | 'dashboard' | 'premium-transition' | 'tarot'
 
 function toApiUrl(path: string) {
   return API_BASE ? `${API_BASE}${path}` : path
@@ -34,6 +34,9 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
   const [chartError, setChartError] = useState<string | null>(null)
   const [chart, setChart] = useState<NatalChartResult | null>(null)
   const [view, setView] = useState<ViewState>('landing')
+  const [activeSection, setActiveSection] = useState<DashboardSection>('yearly')
+  const [pendingSection, setPendingSection] = useState<DashboardSection>('yearly')
+  const [vipUnlocked, setVipUnlocked] = useState(false)
 
   const deferredQuery = useDeferredValue(placeQuery)
 
@@ -94,16 +97,20 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
     }
 
     const delay = view === 'entry-transition' ? ENTRY_TRANSITION_MS : PREMIUM_TRANSITION_MS
-    const nextView = view === 'entry-transition' ? 'story' : 'premium'
     const timer = window.setTimeout(() => {
-      setView(nextView)
+      if (view === 'premium-transition') {
+        setVipUnlocked(true)
+      }
+
+      setView('dashboard')
+      setActiveSection(view === 'entry-transition' ? 'yearly' : pendingSection)
       window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
     }, prefersReducedMotion ? 150 : delay)
 
     return () => {
       window.clearTimeout(timer)
     }
-  }, [prefersReducedMotion, view])
+  }, [pendingSection, prefersReducedMotion, view])
 
   function handlePlaceQueryChange(nextValue: string) {
     setPlaceQuery(nextValue)
@@ -162,6 +169,9 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
 
       startTransition(() => {
         setChart(payload)
+        setActiveSection('yearly')
+        setPendingSection('yearly')
+        setVipUnlocked(false)
         setView('entry-transition')
       })
     } catch (error) {
@@ -172,12 +182,31 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
     }
   }
 
+  function selectSection(section: DashboardSection) {
+    if (section === 'vip' && !vipUnlocked) {
+      setPendingSection('vip')
+      setView('premium-transition')
+      return
+    }
+
+    setActiveSection(section)
+    setView('dashboard')
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
+  }
+
   function openPremium() {
+    setPendingSection('vip')
     setView('premium-transition')
   }
 
-  function backToStory() {
-    setView('story')
+  function openTarot() {
+    setView('tarot')
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
+  }
+
+  function backToDashboard(section: DashboardSection = activeSection) {
+    setActiveSection(section)
+    setView('dashboard')
     window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
   }
 
@@ -189,6 +218,8 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
   }
 
   return {
+    activeSection,
+    backToDashboard,
     chart,
     chartError,
     chartLoading,
@@ -196,17 +227,19 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
     handlePlaceQueryChange,
     handleSubmit,
     openPremium,
-    backToStory,
+    openTarot,
     placeError,
     placeLoading,
     placeQuery,
     placeResults,
     resetToLanding,
     selectPlace,
+    selectSection,
     selectedPlace,
     setDate,
     setTime,
     time,
     view,
+    vipUnlocked,
   }
 }

@@ -136,3 +136,33 @@ export function getTaiwanToday() {
 
   return `${year}-${month}-${day}`
 }
+
+export function getTaiwanYear() {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Taipei',
+    year: 'numeric',
+  }).format(new Date())
+}
+
+function formatTaiwanMonthDay(date: Date) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Taipei',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date)
+}
+
+export function getTaiwanWeekRangeLabel() {
+  const todayLabel = getTaiwanToday()
+  const [year, month, day] = todayLabel.split('-').map(Number)
+  const taiwanDate = new Date(Date.UTC(year, month - 1, day))
+  const weekday = taiwanDate.getUTCDay()
+  const diffToMonday = weekday === 0 ? -6 : 1 - weekday
+  const weekStart = new Date(taiwanDate)
+  weekStart.setUTCDate(taiwanDate.getUTCDate() + diffToMonday)
+
+  const weekEnd = new Date(weekStart)
+  weekEnd.setUTCDate(weekStart.getUTCDate() + 6)
+
+  return `${formatTaiwanMonthDay(weekStart)}-${formatTaiwanMonthDay(weekEnd)}`
+}

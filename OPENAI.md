@@ -1,3 +1,46 @@
+# 2026-03-23 18:24:28
+
+## 本次任務
+- 繼續整體規劃工程，先把桌面儀表板型 SaaS 星盤中控台的第一段骨架實作出來。
+
+## 理解到的需求
+- 依照前面確認過的方向，先做 dashboard 前端骨架，不跳步。
+- 左欄要有：今年預測、本周運勢、各宮位影響範圍、個人設定、VIP 等級、隨機塔羅牌分析。
+- 這一輪先不碰自動化與資料庫，只把前端狀態、切換與占位模組立起來。
+
+## 提出的計畫
+- 先調整前端狀態流，從原本 `story / premium` 改成 `dashboard / tarot / vip 解鎖`。
+- 再新增 Dashboard 與 Tarot 頁面元件，讓中控台與獨立塔羅頁可以運作。
+- 最後補上樣式、跑 `lint` / `build`，確認不影響原本星盤生成。
+
+## 哥哥確認結果
+- 哥哥要求整體規劃的工程繼續，並再次強調要先規劃好再開始做。
+
+## 實際執行內容
+- 改寫 `src/hooks/useChartExperience.ts`，把前端狀態切成 `landing / entry-transition / dashboard / premium-transition / tarot`，並加入 `activeSection`、`vipUnlocked`。
+- 新增 `src/components/DashboardView.tsx`，做出左側導航、中間星盤工作區、右側資訊卡的 SaaS 中控台骨架。
+- 新增 `src/components/TarotView.tsx`，先做獨立塔羅頁的前端骨架與隨機抽牌占位。
+- 調整 `src/App.tsx`，把原本 `story / premium` 流程接到新的 dashboard 與 tarot。
+- 擴充 `src/content.ts` 與 `src/types.ts`，補台灣年份、周區間與 dashboard section 型別。
+- 擴充 `src/App.css`，加入 dashboard 與 tarot 的版型樣式。
+
+## 遇到的問題
+- `App.tsx` 還殘留舊的 `premium` view 判斷，第一次 build 被型別擋下，已修正。
+
+## 驗證結果
+- `npm run lint`：通過。
+- `npm run build`：通過。
+
+## 目前狀態
+- 第一段中控台骨架已完成，可切換左欄內容、保留主星盤工作區、打開 VIP 過場、切到獨立塔羅頁。
+- 自動化、資料庫 schema、每年 / 每週寫庫流程還沒開始，仍屬下一階段。
+
+## 下一步
+- 下一輪可接：
+- 年度 / 週運的資料占位型別與假資料來源。
+- 會員等級欄位與資料庫 schema 草稿。
+- 塔羅頁正式素材與更完整牌陣規則。
+
 # 2026-03-23 17:03:14
 
 ## 本次任務

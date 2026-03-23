@@ -42,6 +42,8 @@ export interface InterpretationBlock {
   body: string
 }
 
+export type DashboardSection = 'yearly' | 'weekly' | 'houses' | 'settings' | 'vip'
+
 export interface NatalChartResult {
   input: {
     date: string
