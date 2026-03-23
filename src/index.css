@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&family=Space+Grotesk:wght@400;500;700&display=swap');
+
+:root {
+  --bg: #07111b;
+  --bg-deep: #04070f;
+  --paper: #f6ecdf;
+  --paper-ink: #22160f;
+  --text-strong: #f6efe5;
+  --text-soft: #d7c8b8;
+  --text-muted: #94a0b0;
+  --accent: #d2a56a;
+  --accent-strong: #f3cf9d;
+  --accent-cool: #9eb6d6;
+  --danger: #ffc4b9;
+  --shadow-deep: 0 36px 90px rgba(0, 0, 0, 0.42);
+  --shadow-soft: 0 24px 64px rgba(0, 0, 0, 0.28);
+  font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+  color: var(--text-soft);
+  background:
+    radial-gradient(circle at top left, rgba(210, 165, 106, 0.18), transparent 24%),
+    radial-gradient(circle at 78% 12%, rgba(158, 182, 214, 0.14), transparent 28%),
+    linear-gradient(180deg, #0b1220 0%, #060a12 100%);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  color: var(--text-soft);
+  background: transparent;
+}
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+body::before {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.16) 0 1px, transparent 1px),
+    radial-gradient(circle at 84% 10%, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px),
+    radial-gradient(circle at 38% 74%, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px),
+    radial-gradient(circle at 88% 70%, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px);
+  opacity: 0.44;
+}
+
+body::after {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.22), transparent 70%);
+  opacity: 0.3;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: 'Cormorant Garamond', 'Noto Serif TC', serif;
+  color: var(--text-strong);
+}
+
+p {
+  margin: 0;
+  line-height: 1.68;
+}
+
+small {
+  color: var(--text-muted);
+}
+
+#root {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+}

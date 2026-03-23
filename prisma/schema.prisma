@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ForecastKind {
+  GLOBAL_MONTHLY
+  WEEKLY_PERSONAL
+  MONTHLY_PERSONAL
+}
+
+enum ForecastStatus {
+  PENDING
+  READY
+  FAILED
+}
+
+enum SubscriptionTier {
+  FREE
+  PREMIUM
+}
+
+model User {
+  id               String           @id @default(cuid())
+  email            String           @unique
+  locale           String           @default("zh-TW")
+  timezone         String           @default("Asia/Taipei")
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  chartProfiles    ChartProfile[]
+  subscriptions    Subscription[]
+  forecastReports  ForecastReport[]
+  forecastJobs     ForecastJob[]
+}
+
+model ChartProfile {
+  id               String           @id @default(cuid())
+  userId           String
+  displayName      String?
+  birthDate        DateTime
+  birthTime        String
+  placeLabel       String
+  city             String
+  countryCode      String
+  latitude         Float
+  longitude        Float
+  locale           String           @default("zh-TW")
+  timezone         String           @default("Asia/Taipei")
+  sunSign          String?
+  moonSign         String?
+  ascendantSign    String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  forecastReports  ForecastReport[]
+
+  @@index([userId])
+}
+
+model Subscription {
+  id                String            @id @default(cuid())
+  userId            String
+  tier              SubscriptionTier  @default(FREE)
+  provider          String?
+  providerRef       String?
+  status            String            @default("inactive")
+  currentPeriodEnd  DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ForecastReport {
+  id               String          @id @default(cuid())
+  userId           String?
+  chartProfileId   String?
+  kind             ForecastKind
+  periodKey        String
+  locale           String          @default("zh-TW")
+  timezone         String          @default("Asia/Taipei")
+  status           ForecastStatus  @default(PENDING)
+  freePreview      String?
+  content          Json?
+  availableAt      DateTime?
+  generatedAt      DateTime?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  chartProfile     ChartProfile?   @relation(fields: [chartProfileId], references: [id], onDelete: SetNull)
+  user             User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  jobs             ForecastJob[]
+
+  @@unique([chartProfileId, kind, periodKey, locale])
+  @@index([userId])
+  @@index([kind, periodKey, locale])
+}
+
+model ForecastJob {
+  id               String          @id @default(cuid())
+  userId           String?
+  forecastReportId String?
+  kind             ForecastKind
+  periodKey        String
+  locale           String          @default("zh-TW")
+  timezone         String          @default("Asia/Taipei")
+  runAt            DateTime
+  status           ForecastStatus  @default(PENDING)
+  payload          Json?
+  errorMessage     String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  forecastReport   ForecastReport? @relation(fields: [forecastReportId], references: [id], onDelete: SetNull)
+  user             User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([runAt, status])
+  @@index([kind, periodKey, locale])
+}
