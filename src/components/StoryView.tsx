@@ -30,7 +30,7 @@ export function StoryView({
     {
       label: APP_COPY.summaryLabels.dominant,
       value: `${getElementDisplay(chart.summary.dominantElement)} / ${getModalityDisplay(chart.summary.dominantModality)}`,
-      meta: `${chart.summary.dominantElementCount} 顆主行星 / ${chart.summary.dominantModalityCount} 種模式`,
+      meta: `${chart.summary.dominantElementCount} 顆主行星 · ${chart.summary.dominantModalityCount} 種模式`,
     },
   ]
 
@@ -55,7 +55,7 @@ export function StoryView({
         <div className="story-grid">
           <article className="story-card story-card--chart">
             <div className="card-head">
-              <span className="section-kicker">Natal Wheel</span>
+              <span className="section-kicker">本命盤</span>
               <h2>{APP_COPY.summaryTitle}</h2>
             </div>
 
@@ -83,7 +83,7 @@ export function StoryView({
 
           <article className="story-card story-card--reading">
             <div className="card-head">
-              <span className="section-kicker">Short Reading</span>
+              <span className="section-kicker">開場</span>
               <h2>{APP_COPY.freeReadingTitle}</h2>
               <p>{APP_COPY.freeReadingLead}</p>
             </div>
@@ -92,7 +92,7 @@ export function StoryView({
 
           <article className="story-card story-card--highlights">
             <div className="card-head">
-              <span className="section-kicker">Highlights</span>
+              <span className="section-kicker">訊號</span>
               <h2>{APP_COPY.highlightsTitle}</h2>
             </div>
             <div className="highlight-list">
@@ -106,14 +106,15 @@ export function StoryView({
 
           <article className="story-card story-card--unlock">
             <div className="card-head">
-              <span className="section-kicker">Premium Gate</span>
+              <span className="section-kicker">往下更深</span>
               <h2>{APP_COPY.unlockTitle}</h2>
-              <p>{chart.interpretation.premiumTeaser}</p>
+              <p>{APP_COPY.unlockLead}</p>
             </div>
 
             <button type="button" className="primary-button" onClick={onOpenPremium}>
               {APP_COPY.unlockButton}
             </button>
+            <p>{chart.interpretation.premiumTeaser}</p>
             <small>{APP_COPY.unlockFootnote}</small>
           </article>
         </div>

@@ -204,7 +204,7 @@ function buildCoreSection(summary: {
   const rising = getSignProfile(summary.ascendant.sign)
 
   return {
-    title: '核心人格',
+    title: '你真正的底色',
     body: `你給人的第一印象，常常帶著${rising.name}那種「${rising.core}」的味道，所以別人會先感覺到你的保留、你的節奏，或你不想被輕易定義的那一面。可是你真正的決策核心，是${sun.name}對於「${sun.work}」的渴望；而在情緒底層，${moon.name}又一直提醒你要先確認感受有沒有被安放。這代表你不是單一人格，而是外在出場、內在感受、核心決策三股力量一起運作。當它們不同步時，你會覺得自己一下想衝、一下想退；當你願意承認兩種需求都是真的，反而會更穩。`,
   }
 }
@@ -215,7 +215,7 @@ function buildRelationshipSection(planets: PlanetPlacement[], summary: { moon: P
   const venusProfile = venus ? getSignProfile(venus.sign) : moon
 
   return {
-    title: '情感與關係',
+    title: '你怎麼靠近愛',
     body: `在關係裡，你不是只看感覺，也不是只看條件；你真正要的是一種「能不能安心做自己」的感覺。${moon.name}讓你情緒上特別在意${moon.emotion}，所以對方如果只回應表面、卻沒有碰到你真正的在意點，你會立刻把心收回來。${venusProfile.name}的愛情模式，則讓你更傾向${venusProfile.relationship}。這代表你要的不是熱鬧陪伴，而是有來有往、有誠意、有一致性的互動。你一旦認真投入，就不是玩玩而已；真正的課題，是在深情之前，先把邊界說清楚。`,
   }
 }
@@ -230,7 +230,7 @@ function buildWorkSection(planets: PlanetPlacement[], summary: {
   const midheaven = getSignProfile(summary.midheaven.sign)
 
   return {
-    title: '工作與天賦',
+    title: '你怎麼發光',
     body: `你的工作力，不只是會不會做事，而是你如何把自己推進到對的位置。${sun.name}會讓你想在自己的專長上被看見，${marsProfile.name}則決定你出手的節奏與戰鬥方式。這也讓你在工作上特別適合${sun.work}，同時又會用${marsProfile.work}的方式把事情推進。至於事業形象，${midheaven.name}會讓你更容易在外界留下「${midheaven.work}」的印象。你真正的優勢不是拚命，而是當你把節奏抓回自己手上時，會比很多人更知道什麼值得長期投入。`,
   }
 }
@@ -248,7 +248,7 @@ function buildGrowthSection(
   const moonTheme = getHouseTheme(summary.moon.house)
 
   return {
-    title: '現階段成長課題',
+    title: '你現在最該學會的事',
     body: `${ELEMENT_GUIDE[summary.dominantElement] || ''}${MODE_GUIDE[summary.dominantModality] || ''} 這也說明你最近最需要整理的，不只是效率，而是你的內在分配。太陽所在的${sunTheme}提醒你要把主導權拿回來；月亮所在的${moonTheme}則提醒你，情緒不是雜訊，而是導航。${describeClosestAspect(aspects)} 如果你一直逼自己只靠硬撐往前，會越走越乾；如果你願意承認自己真正的消耗點，很多卡住的地方反而會開始鬆動。`,
   }
 }
@@ -284,7 +284,7 @@ export function buildInterpretation({
 
   return {
     headline: `${sun.name}太陽 × ${moon.name}月亮 × ${rising.name}上升`,
-    subheadline: `這是你在 ${input.placeLabel} 生成的首版命盤檔案，先用短讀抓重點，再進入完整長版解讀。`,
+    subheadline: `你在 ${input.placeLabel} 打開的這張盤，先透露了你的核心性格、情感慣性，以及最近最該面對的成長課題。`,
     keywords: [sun.name, moon.name, rising.name, summary.dominantElement, summary.dominantModality],
     highlights: [
       `${sun.name}太陽落在${summary.sun.houseLabel}`,
@@ -293,7 +293,7 @@ export function buildInterpretation({
       `${summary.dominantElement}元素與${summary.dominantModality}模式偏強`,
     ],
     freeReading: buildFreeReading(summary),
-    premiumTeaser: '完整付費版會繼續展開你的關係模式、工作節奏、情緒觸發點與下一階段成長提醒。',
+    premiumTeaser: '如果你願意往下，下一頁會把你在愛裡怎麼靠近、在工作裡怎麼發光、又在哪裡最容易卡住，慢慢說給你聽。',
     sections,
   }
 }

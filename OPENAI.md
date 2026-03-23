@@ -598,6 +598,40 @@
 
 ## 目前狀態
 - Zeabur 部署補強進行中。
+# 2026-03-23 15:40:45
+
+## 本次任務
+- 把頁面裡的文案改掉，讓整體口吻不要再像工作報告或產品驗證頁。
+
+## 理解到的需求
+- 目前首頁、次頁、付費頁與過場小標仍有不少偏技術、偏 demo 的措辭。
+- 不只 UI 文案要改，命盤回傳的開場白、段落標題與付費 teaser 也要一起換掉，不然畫面會一半像品牌、一半像報告。
+
+## 提出的計畫
+- 重寫 `src/content.ts` 的整組前端 copy。
+- 調整 `StoryView`、`PremiumView`、`InteractiveTransition`、`LandingView` 的區塊標籤與按鈕口吻。
+- 同步重寫 `server/services/interpretation.ts` 的段落命名與開場文字。
+
+## 哥哥確認結果
+- 哥哥要求直接進行，並以「不要看起來像工作報告」為主要方向。
+
+## 實際執行內容
+- 把首頁主標、表單引導、過場標題、次頁與付費頁 copy 改成更偏品牌敘事與閱讀體驗的語氣。
+- 將 `Short Reading`、`Premium Gate`、`Payload` 等偏產品標籤的小標改成中文且更貼近閱讀情境。
+- 將命盤回傳段落標題改成「你真正的底色 / 你怎麼靠近愛 / 你怎麼發光 / 你現在最該學會的事」。
+- 將付費頁 teaser 改成更像對話式邀請，而不是欄位說明。
+
+## 驗證結果
+- `npm run build`：通過
+- `npm run lint`：通過
+- smoke test：確認 `subheadline`、`premiumTeaser`、sections 標題都已吃到新版文案。
+
+## 目前狀態
+- 文案改稿完成，待 commit 與 push。
+
+## 下一步
+- 建立 commit，推上 GitHub。
+
 # 2026-03-23 15:26:03
 
 ## 本次任務

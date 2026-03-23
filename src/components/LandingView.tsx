@@ -56,7 +56,7 @@ export function LandingView({
 
         <aside className="form-panel">
           <div className="section-heading">
-            <span className="section-kicker">Chart Input</span>
+            <span className="section-kicker">出生資料</span>
             <h2>{APP_COPY.formTitle}</h2>
             <p>{APP_COPY.formLead}</p>
           </div>

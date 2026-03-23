@@ -60,8 +60,8 @@ export function InteractiveTransition({
         } as CSSProperties
       }
     >
-      <div className="transition-copy">
-        <span className="eyebrow">Interactive Transition</span>
+        <div className="transition-copy">
+        <span className="eyebrow">{variant === 'entry' ? '星圖過場' : '完整閱讀'}</span>
         <h1>{title}</h1>
         <p>{lead}</p>
         <small>{hint}</small>

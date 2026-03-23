@@ -30,7 +30,7 @@ export function PremiumView({
     {
       label: APP_COPY.summaryLabels.dominant,
       value: `${getElementDisplay(chart.summary.dominantElement)} / ${getModalityDisplay(chart.summary.dominantModality)}`,
-      meta: `${chart.summary.dominantElementCount} 顆主行星 / ${chart.summary.dominantModalityCount} 種模式`,
+      meta: `${chart.summary.dominantElementCount} 顆主行星 · ${chart.summary.dominantModalityCount} 種模式`,
     },
   ]
 
@@ -60,14 +60,14 @@ export function PremiumView({
 
         <div className="premium-grid">
           <article className="premium-card premium-card--intro">
-            <span className="premium-inline-label">Headline</span>
+            <span className="premium-inline-label">開場</span>
             <h2>{chart.interpretation.headline}</h2>
             <p>{chart.interpretation.subheadline}</p>
           </article>
 
           <article className="premium-card premium-card--chart">
             <div className="card-head">
-              <span className="section-kicker">Chart Snapshot</span>
+              <span className="section-kicker">星盤快照</span>
               <h2>{APP_COPY.summaryTitle}</h2>
             </div>
 
@@ -95,7 +95,7 @@ export function PremiumView({
 
           <article className="premium-card premium-card--sidebar">
             <div className="card-head">
-              <span className="section-kicker">Payload</span>
+              <span className="section-kicker">這份閱讀</span>
               <h2>{APP_COPY.premiumSidebarTitle}</h2>
             </div>
 
@@ -110,7 +110,7 @@ export function PremiumView({
 
           <article className="premium-card premium-card--sections">
             <div className="card-head">
-              <span className="section-kicker">Long Reading</span>
+              <span className="section-kicker">完整長讀</span>
               <h2>{APP_COPY.premiumSectionsTitle}</h2>
             </div>
 
