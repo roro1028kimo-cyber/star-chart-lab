@@ -1,3 +1,35 @@
+# 2026-03-23 23:09:16
+
+## 本次任務
+- 讀取 `index2` 參考稿，改寫 React 首頁成新的 Aura 風格首頁，並保留原本命盤輸入與查詢流程。
+
+## 需求理解
+- 哥哥希望以 `index2` 當首頁視覺基準。
+- 舊首頁版型要移除，但既有功能不能掉，包含生日、時間、地點搜尋、送出命盤。
+- `Vite` 的入口 `index.html` 仍需保留，真正被替換的是首頁 UI 實作。
+
+## 計畫
+- 改 `src/components/LandingView.tsx`，重做首頁結構並把既有表單功能接回去。
+- 改 `src/App.css`，補上新首頁所需的玻璃感、星盤環、背景與 feature strip 樣式。
+- 刪除已整合完成的 `index2` 參考檔。
+- 跑 `npm run lint` 與 `npm run build` 驗證。
+
+## 實際執行
+- 重寫 `LandingView`，加入新導覽列、hero、form card、視覺化星盤環與底部 feature strip。
+- 保留 `onSubmit`、地點搜尋結果清單、錯誤訊息、selected place 狀態與 loading 按鈕邏輯。
+- 在 `App.css` 新增 `landing-v2` 相關樣式與 RWD / reduced-motion 規則。
+- 刪除 `index2`。
+
+## 驗證
+- `npm run lint`：通過
+- `npm run build`：通過
+
+## 目前狀態
+- 新首頁已整合完成，既有命盤流程仍可接續到 dashboard。
+
+## 下一步
+- 若哥哥要，我可以再往下把首頁文案全部整理成一致語氣，或繼續補更完整的商品 / 購物車入口。
+
 # 2026-03-23 19:18:00
 
 ## 本次任務
