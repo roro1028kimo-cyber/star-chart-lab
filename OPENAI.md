@@ -1,3 +1,36 @@
+# 2026-03-23 17:03:14
+
+## 本次任務
+- 整理過場動畫資產位置，固定成方便之後直接呼叫的資料夾。
+
+## 理解到的需求
+- 哥哥提醒要記住這支過場動畫，並找一個固定資料夾存放，方便後續直接替換或呼叫。
+
+## 提出的計畫
+- 先建立專用的過場影片資料夾。
+- 將目前影片複製到新位置，避免直接搬動造成風險。
+- 更新過場元件的呼叫路徑，並補上資料夾說明。
+
+## 哥哥確認結果
+- 哥哥希望之後過場動畫有固定位置可以直接拿來用。
+
+## 實際執行內容
+- 建立 `public/media/transitions/`。
+- 將目前過場影片複製到 `public/media/transitions/tunnel-light.mp4`。
+- 修改 `src/components/InteractiveTransition.tsx`，改從 `/media/transitions/tunnel-light.mp4` 讀取影片。
+- 新增 `public/media/transitions/README.md`，記錄命名方式與替換規則。
+
+## 驗證結果
+- `npm run lint`：通過。
+- `npm run build`：通過。
+- `public/media/transitions/` 內已確認有 `tunnel-light.mp4` 與 `README.md`。
+
+## 目前狀態
+- 過場影片已有固定資產資料夾，之後要換片時只要覆蓋同檔名即可。
+
+## 下一步
+- 若哥哥後續提供更多過場版本，可直接放進同資料夾，我再依情境切換不同路徑。
+
 # 2026-03-23 16:44:25
 
 ## 本次任務

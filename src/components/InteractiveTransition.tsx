@@ -6,7 +6,7 @@ type Burst = {
   y: number
 }
 
-const TRANSITION_VIDEO_SRC = '/transitions/tunnel-light.mp4'
+const TRANSITION_VIDEO_SRC = '/media/transitions/tunnel-light.mp4'
 
 export function InteractiveTransition({
   hint,
