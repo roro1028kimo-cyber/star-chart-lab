@@ -58,8 +58,16 @@ function App() {
           onBackHome={experience.resetToLanding}
           onOpenPremium={experience.openPremium}
           onOpenTarot={experience.openTarot}
+          onRetryWeeklyForecast={experience.retryWeeklyForecast}
+          onRetryYearlyForecast={experience.retryYearlyForecast}
           onSelectSection={experience.selectSection}
           vipUnlocked={experience.vipUnlocked}
+          weeklyForecast={experience.weeklyForecast}
+          weeklyForecastError={experience.weeklyForecastError}
+          weeklyForecastLoading={experience.weeklyForecastLoading}
+          yearlyForecast={experience.yearlyForecast}
+          yearlyForecastError={experience.yearlyForecastError}
+          yearlyForecastLoading={experience.yearlyForecastLoading}
         />
       )}
 

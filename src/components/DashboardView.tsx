@@ -7,7 +7,7 @@ import {
   getTaiwanWeekRangeLabel,
   getTaiwanYear,
 } from '../content'
-import type { DashboardSection, NatalChartResult } from '../types'
+import type { DashboardSection, ForecastResponse, NatalChartResult } from '../types'
 import { ChartWheel } from './ChartWheel'
 import { PlacementTable } from './PlacementTable'
 
@@ -61,7 +61,15 @@ export function DashboardView({
   onOpenPremium,
   onOpenTarot,
   onSelectSection,
+  onRetryWeeklyForecast,
+  onRetryYearlyForecast,
   vipUnlocked,
+  weeklyForecast,
+  weeklyForecastError,
+  weeklyForecastLoading,
+  yearlyForecast,
+  yearlyForecastError,
+  yearlyForecastLoading,
 }: {
   activeSection: DashboardSection
   chart: NatalChartResult
@@ -69,12 +77,85 @@ export function DashboardView({
   onOpenPremium: () => void
   onOpenTarot: () => void
   onSelectSection: (section: DashboardSection) => void
+  onRetryWeeklyForecast: () => void
+  onRetryYearlyForecast: () => void
   vipUnlocked: boolean
+  weeklyForecast: ForecastResponse | null
+  weeklyForecastError: string | null
+  weeklyForecastLoading: boolean
+  yearlyForecast: ForecastResponse | null
+  yearlyForecastError: string | null
+  yearlyForecastLoading: boolean
 }) {
   const currentYear = getTaiwanYear()
   const weekRange = getTaiwanWeekRangeLabel()
   const summaryItems = buildSummaryItems(chart)
   const houseCards = buildHouseCards(chart)
+
+  function renderForecastPanel({
+    forecast,
+    error,
+    loading,
+    onRetry,
+    title,
+    lead,
+  }: {
+    forecast: ForecastResponse | null
+    error: string | null
+    loading: boolean
+    onRetry: () => void
+    title: string
+    lead: string
+  }) {
+    if (loading) {
+      return (
+        <div className="dashboard-copy-block">
+          <p>{lead}</p>
+          <p>正在向後端安全代理請求內容，API key 只會留在 server 端，不會進到前端。</p>
+        </div>
+      )
+    }
+
+    if (error) {
+      return (
+        <div className="vip-lock-panel">
+          <p>{error}</p>
+          <button type="button" className="secondary-button" onClick={onRetry}>
+            重新取得 {title}
+          </button>
+        </div>
+      )
+    }
+
+    if (!forecast) {
+      return (
+        <div className="dashboard-copy-block">
+          <p>{lead}</p>
+        </div>
+      )
+    }
+
+    return (
+      <>
+        <div className="dashboard-copy-block">
+          <p>{forecast.summary}</p>
+          <p>{forecast.body}</p>
+        </div>
+
+        <div className="highlight-list">
+          {forecast.bullets.map((item) => (
+            <span key={item} className="highlight-pill">
+              {item}
+            </span>
+          ))}
+        </div>
+
+        <small className="dashboard-meta-note">
+          生成時間：{forecast.generatedAt} · 來源：{forecast.source} · {forecast.stored ? '已記錄資料庫' : '目前尚未寫入資料庫'}
+        </small>
+      </>
+    )
+  }
 
   const sidebarItems: SidebarItem[] = [
     {
@@ -121,20 +202,18 @@ export function DashboardView({
         <article className="dashboard-focus-card">
           <div className="card-head">
             <span className="section-kicker">年度主題</span>
-            <h2>{currentYear} 今年預測</h2>
-            <p>這一區先用本命盤主軸做占位，等自動化與資料庫串好後，會由每年生成內容直接覆寫。</p>
+            <h2>{yearlyForecast?.title || `${currentYear} 今年預測`}</h2>
+            <p>這一區已直接走後端 API 生成，金鑰只會放在 server env，不會出現在前端。</p>
           </div>
 
-          <div className="dashboard-copy-block">
-            <p>{chart.interpretation.subheadline}</p>
-            <p>
-              今年比較值得你留意的是 {getElementDisplay(chart.summary.dominantElement)} 的推進方式，搭配
-              {getModalityDisplay(chart.summary.dominantModality)} 的節奏，會讓你在工作、關係和自我定位上特別有感。
-            </p>
-            <p>
-              現在先把它當成年度導覽首頁。等資料流程正式掛上去之後，這裡會變成「已生成、已記錄、可追蹤歷史版本」的年度預測模組。
-            </p>
-          </div>
+          {renderForecastPanel({
+            forecast: yearlyForecast,
+            error: yearlyForecastError,
+            loading: yearlyForecastLoading,
+            onRetry: onRetryYearlyForecast,
+            title: '年度預測',
+            lead: '年度預測正在生成中。',
+          })}
         </article>
       )
     }
@@ -144,16 +223,18 @@ export function DashboardView({
         <article className="dashboard-focus-card">
           <div className="card-head">
             <span className="section-kicker">本周焦點</span>
-            <h2>本周({weekRange})運勢分析</h2>
-            <p>這一區會是未來每週自動更新的入口。這一版先把前端顯示結構與資料欄位留好。</p>
+            <h2>{weeklyForecast?.title || `本周(${weekRange})運勢分析`}</h2>
+            <p>這一區已直接走後端 API 生成，之後可再接每週自動排程。</p>
           </div>
 
-          <div className="dashboard-copy-block">
-            <p>
-              這周可以先把焦點放在 {chart.summary.sun.houseLabel} 與 {chart.summary.moon.houseLabel} 對應的生活主題，因為你的外在推進和內在情緒都會在這兩塊特別明顯。
-            </p>
-            <p>如果你想知道更細的每週節奏，之後自動化上線後，這裡會顯示每週生成時間、版本紀錄與已寫入資料庫的內容摘要。</p>
-          </div>
+          {renderForecastPanel({
+            forecast: weeklyForecast,
+            error: weeklyForecastError,
+            loading: weeklyForecastLoading,
+            onRetry: onRetryWeeklyForecast,
+            title: '本周運勢',
+            lead: '本周運勢正在生成中。',
+          })}
         </article>
       )
     }
@@ -348,13 +429,13 @@ export function DashboardView({
           <article className="dashboard-rail__card">
             <span className="section-kicker">年度更新</span>
             <h3>{currentYear}今年預測</h3>
-            <p>前端入口已建立。等自動化流程上線後，這裡會顯示最後生成時間與寫庫狀態。</p>
+            <p>{yearlyForecast?.summary || yearlyForecastError || '等待年度預測生成中。'}</p>
           </article>
 
           <article className="dashboard-rail__card">
             <span className="section-kicker">每周更新</span>
             <h3>本周({weekRange})</h3>
-            <p>每週分析會在這裡顯示摘要與版本時間。這一版先把版位與狀態卡立起來。</p>
+            <p>{weeklyForecast?.summary || weeklyForecastError || '等待本周運勢生成中。'}</p>
           </article>
 
           <article className="dashboard-rail__card">

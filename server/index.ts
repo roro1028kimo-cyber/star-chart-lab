@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { config, getPreferredAiProvider } from './config.js'
 import { prisma } from './lib/prisma.js'
 import { generateAiAdvice } from './services/ai.js'
+import { getOrGenerateForecast } from './services/forecast.js'
 import { searchPlaces } from './services/places.js'
 import { calculateNatalChart } from './services/thoth.js'
 
@@ -22,6 +23,12 @@ const natalRequestSchema = z.object({
 
 const aiRequestSchema = z.object({
   chart: z.any(),
+})
+
+const forecastRequestSchema = z.object({
+  chart: z.any(),
+  locale: z.string().optional(),
+  force: z.boolean().optional(),
 })
 
 app.use(cors())
@@ -127,6 +134,58 @@ app.post('/api/premium/email', (_request, response) => {
     endpoint: config.emailDeliveryApiUrl || 'EMAIL_DELIVERY_API_URL',
     error: 'Email delivery API placeholder. Fill EMAIL_DELIVERY_API_URL and EMAIL_DELIVERY_API_KEY to connect it.',
   })
+})
+
+app.post('/api/forecasts/yearly', async (request, response) => {
+  const parsed = forecastRequestSchema.safeParse(request.body)
+
+  if (!parsed.success) {
+    response.status(400).json({
+      error: '年度預測請求格式不正確。',
+    })
+    return
+  }
+
+  try {
+    const result = await getOrGenerateForecast({
+      chart: parsed.data.chart,
+      force: parsed.data.force,
+      kind: 'yearly',
+      locale: parsed.data.locale || 'zh-TW',
+    })
+
+    response.json(result)
+  } catch (error) {
+    response.status(500).json({
+      error: error instanceof Error ? error.message : '年度預測暫時失敗。',
+    })
+  }
+})
+
+app.post('/api/forecasts/weekly', async (request, response) => {
+  const parsed = forecastRequestSchema.safeParse(request.body)
+
+  if (!parsed.success) {
+    response.status(400).json({
+      error: '本周運勢請求格式不正確。',
+    })
+    return
+  }
+
+  try {
+    const result = await getOrGenerateForecast({
+      chart: parsed.data.chart,
+      force: parsed.data.force,
+      kind: 'weekly',
+      locale: parsed.data.locale || 'zh-TW',
+    })
+
+    response.json(result)
+  } catch (error) {
+    response.status(500).json({
+      error: error instanceof Error ? error.message : '本周運勢暫時失敗。',
+    })
+  }
 })
 
 if (process.env.NODE_ENV === 'production') {

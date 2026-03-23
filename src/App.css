@@ -1264,6 +1264,12 @@
   margin-top: 18px;
 }
 
+.dashboard-meta-note {
+  display: block;
+  margin-top: 16px;
+  color: var(--text-muted);
+}
+
 .house-impact-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

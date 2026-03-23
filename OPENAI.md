@@ -1,3 +1,63 @@
+# 2026-03-23 18:57:44
+
+## 本次任務
+- 啟動第二段工程，把 `今年預測 / 本周運勢` 從前端占位改成直接接後端真 API，並保護 API key 不落到前端。
+
+## 理解到的需求
+- 哥哥要求第二段不要再用假資料，要直接接 API。
+- API key 不能暴露在前端，要透過安全方式保護。
+- 同時希望知道應該在哪裡填入自己的 API 設定。
+
+## 提出的計畫
+- 先沿用現有 server env 與 AI provider 設計，把年度 / 每週分析做成 server 代理 route。
+- 再讓 dashboard 前端只打站內 `/api/forecasts/...`，不直接接外部模型 API。
+- 最後補 `.env.example` 說明，並驗證 lint / build。
+
+## 哥哥確認結果
+- 哥哥明確要求第二段直接接 API，並要求保護 API，且要告訴哥哥在哪裡填。
+
+## 實際執行內容
+- 新增 `server/services/forecast.ts`，用 server 端的 AI provider 生成年度 / 本周分析。
+- 在 `server/index.ts` 新增：
+- `POST /api/forecasts/yearly`
+- `POST /api/forecasts/weekly`
+- 讓前端改走站內 API，不直接暴露外部 provider 金鑰。
+- 實作 forecast 內容快取 / 讀取邏輯：
+- 若資料庫可用，會優先找同一張盤同一期別的既有內容。
+- 若找不到，就即時生成並嘗試寫入 `ForecastReport`。
+- 調整 `src/hooks/useChartExperience.ts`，加入年度 / 每週 forecast 的 loading、error、retry、資料狀態。
+- 調整 `src/components/DashboardView.tsx`，把 `今年預測` 與 `本周運勢` 改成直接顯示 API 回傳內容，不再顯示假文案。
+- 調整 `src/App.tsx`、`src/App.css`、`src/types.ts` 支援 forecast 顯示。
+- 更新 `.env.example`，標註 AI provider 相關欄位是 server 端安全代理要填的位置。
+
+## 驗證結果
+- `npm run lint`：通過。
+- `npm run build`：通過。
+- 環境檢查：目前 server 偵測到的 AI provider 為 `openai`。
+
+## 目前狀態
+- 前端已直接接站內後端 forecast API。
+- API key 不會出現在前端。
+- 若 `DATABASE_URL` 可用且資料表已存在，forecast 會嘗試寫入資料庫；若資料庫未配置，仍可生成內容，但 `stored` 會是 false。
+
+## 哥哥要填的位置
+- 檔案位置：`C:\codex\star-chart-lab\.env`
+- 主要欄位：
+- `AI_PROVIDER=openai` 或 `AI_PROVIDER=gemini`
+- `OPENAI_API_KEY=...`
+- `OPENAI_MODEL=...`
+- 或 `GEMINI_API_KEY=...`
+- `GEMINI_MODEL=...`
+- 若要寫入資料庫：
+- `DATABASE_URL=...`
+- 之後請跑：
+- `npm run db:push`
+
+## 下一步
+- 如果哥哥要，我下一輪可以接：
+- 把年度 / 每週分析的資料庫內容做成真正的歷史查詢列表。
+- 補上自動排程 job，讓每週 / 每年自動生成，不必每次由前端觸發。
+
 # 2026-03-23 18:24:28
 
 ## 本次任務

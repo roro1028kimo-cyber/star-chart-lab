@@ -1,6 +1,6 @@
-import { startTransition, useDeferredValue, useEffect, useState, type FormEvent } from 'react'
+import { startTransition, useCallback, useDeferredValue, useEffect, useState, type FormEvent } from 'react'
 import { APP_COPY } from '../content'
-import type { DashboardSection, NatalChartResult, PlaceSuggestion } from '../types'
+import type { DashboardSection, ForecastResponse, NatalChartResult, PlaceSuggestion } from '../types'
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
 const MIN_LOADING_MS = 1200
@@ -37,6 +37,12 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
   const [activeSection, setActiveSection] = useState<DashboardSection>('yearly')
   const [pendingSection, setPendingSection] = useState<DashboardSection>('yearly')
   const [vipUnlocked, setVipUnlocked] = useState(false)
+  const [yearlyForecast, setYearlyForecast] = useState<ForecastResponse | null>(null)
+  const [weeklyForecast, setWeeklyForecast] = useState<ForecastResponse | null>(null)
+  const [yearlyForecastLoading, setYearlyForecastLoading] = useState(false)
+  const [weeklyForecastLoading, setWeeklyForecastLoading] = useState(false)
+  const [yearlyForecastError, setYearlyForecastError] = useState<string | null>(null)
+  const [weeklyForecastError, setWeeklyForecastError] = useState<string | null>(null)
 
   const deferredQuery = useDeferredValue(placeQuery)
 
@@ -112,6 +118,30 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
     }
   }, [pendingSection, prefersReducedMotion, view])
 
+  useEffect(() => {
+    if (!chart || view === 'landing' || view === 'entry-transition') {
+      return
+    }
+
+    if (!yearlyForecast && !yearlyForecastLoading && !yearlyForecastError) {
+      void loadForecast('yearly')
+    }
+
+    if (!weeklyForecast && !weeklyForecastLoading && !weeklyForecastError) {
+      void loadForecast('weekly')
+    }
+  }, [
+    chart,
+    loadForecast,
+    view,
+    yearlyForecast,
+    weeklyForecast,
+    yearlyForecastLoading,
+    weeklyForecastLoading,
+    yearlyForecastError,
+    weeklyForecastError,
+  ])
+
   function handlePlaceQueryChange(nextValue: string) {
     setPlaceQuery(nextValue)
     setSelectedPlace(null)
@@ -124,6 +154,44 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
     setPlaceResults([])
     setPlaceError(null)
   }
+
+  const loadForecast = useCallback(async (kind: 'yearly' | 'weekly', force = false) => {
+    if (!chart) {
+      return
+    }
+
+    const setLoading = kind === 'yearly' ? setYearlyForecastLoading : setWeeklyForecastLoading
+    const setError = kind === 'yearly' ? setYearlyForecastError : setWeeklyForecastError
+    const setData = kind === 'yearly' ? setYearlyForecast : setWeeklyForecast
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch(toApiUrl(`/api/forecasts/${kind}`), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chart,
+          locale: 'zh-TW',
+          force,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(await readError(response))
+      }
+
+      const payload = (await response.json()) as ForecastResponse
+      setData(payload)
+    } catch (error) {
+      setError(error instanceof Error ? error.message : `${kind} forecast failed`)
+    } finally {
+      setLoading(false)
+    }
+  }, [chart])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -172,6 +240,10 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
         setActiveSection('yearly')
         setPendingSection('yearly')
         setVipUnlocked(false)
+        setYearlyForecast(null)
+        setWeeklyForecast(null)
+        setYearlyForecastError(null)
+        setWeeklyForecastError(null)
         setView('entry-transition')
       })
     } catch (error) {
@@ -233,6 +305,14 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
     placeQuery,
     placeResults,
     resetToLanding,
+    weeklyForecast,
+    weeklyForecastError,
+    weeklyForecastLoading,
+    yearlyForecast,
+    yearlyForecastError,
+    yearlyForecastLoading,
+    retryWeeklyForecast: () => loadForecast('weekly', true),
+    retryYearlyForecast: () => loadForecast('yearly', true),
     selectPlace,
     selectSection,
     selectedPlace,
