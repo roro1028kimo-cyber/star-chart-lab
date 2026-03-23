@@ -528,8 +528,16 @@
 - 哥哥已提供正式 GitHub 倉庫網址，可直接執行推送。
 
 ## 實際執行內容
-- 準備設定 Git remote。
-- 準備建立初始 commit 並推送。
+- 設定 `origin` 指向 `https://github.com/roro1028kimo-cyber/star-chart-lab.git`。
+- 將目前專案內容加入版控並建立初始 commit：`Initial commit`。
+- 成功將 `main` 推送到 GitHub，並建立上游追蹤分支。
+
+## 驗證
+- `git status --short`
+- `git diff --cached --stat`
+- `git commit -m "Initial commit"`
+- `git push -u origin main`
 
 ## 目前狀態
-- GitHub 上版流程執行中。
+- GitHub 初始上版已完成。
+- 目前本地 `main` 已追蹤 `origin/main`。
