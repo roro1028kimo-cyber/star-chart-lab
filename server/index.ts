@@ -3,6 +3,7 @@ import express from 'express'
 import path from 'node:path'
 import { z } from 'zod'
 import { config, getPreferredAiProvider } from './config.js'
+import { prisma } from './lib/prisma.js'
 import { generateAiAdvice } from './services/ai.js'
 import { searchPlaces } from './services/places.js'
 import { calculateNatalChart } from './services/thoth.js'
@@ -26,11 +27,27 @@ const aiRequestSchema = z.object({
 app.use(cors())
 app.use(express.json({ limit: '1mb' }))
 
-app.get('/api/health', (_request, response) => {
+app.get('/api/health', async (_request, response) => {
+  const databaseConfigured = Boolean(process.env.DATABASE_URL?.trim())
+  let databaseConnected = false
+  let databaseError: string | null = null
+
+  if (databaseConfigured) {
+    try {
+      await prisma.$queryRaw`SELECT 1`
+      databaseConnected = true
+    } catch (error) {
+      databaseError = error instanceof Error ? error.message : '資料庫連線檢查失敗。'
+    }
+  }
+
   response.json({
     ok: true,
     aiConfigured: Boolean(getPreferredAiProvider()),
     aiProvider: getPreferredAiProvider(),
+    databaseConfigured,
+    databaseConnected,
+    databaseError,
   })
 })
 

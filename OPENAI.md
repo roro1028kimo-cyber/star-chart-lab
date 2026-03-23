@@ -571,3 +571,30 @@
 ## 目前狀態
 - GitHub README 展示面已更新完成。
 - 下一步可視需要再補 GitHub About 文案、topics 或部署說明。
+
+# 2026-03-23 12:44:53
+
+## 本次任務
+- 補強 Zeabur 部署檢查能力，讓 app 部署後能直接驗證資料庫是否有接上。
+
+## 理解到的需求
+- 哥哥已在 Zeabur 上建立 app 與 PostgreSQL 服務，現在想確認部署設定能不能正確吃到環境變數並連上資料庫。
+- 目前專案雖然有 Prisma schema，但 API 尚未真的讀寫資料庫，因此需要額外的 health check 來判斷 DB 是否接通。
+
+## 提出的計畫
+- 在 `/api/health` 補上資料庫連線檢查。
+- 新增 `zbpack.json`，明確指定 Zeabur build / start 指令。
+- 保持 Prisma schema 不變，只補部署驗證能力。
+
+## 哥哥確認結果
+- 哥哥希望我直接把部署補強做好。
+
+## 實際執行內容
+- 在 `server/index.ts` 的 health route 補上 `DATABASE_URL` 是否存在與 PostgreSQL 連線檢查。
+- 新增 `zbpack.json`，把 Zeabur 指向 `npm run build` 與 `npm run start`。
+
+## 驗證
+- 準備重新執行 `npm run build` 驗證部署相關修改。
+
+## 目前狀態
+- Zeabur 部署補強進行中。
