@@ -6,6 +6,8 @@ type Burst = {
   y: number
 }
 
+const TRANSITION_VIDEO_SRC = '/transitions/tunnel-light.mp4'
+
 export function InteractiveTransition({
   hint,
   lead,
@@ -60,7 +62,10 @@ export function InteractiveTransition({
         } as CSSProperties
       }
     >
-        <div className="transition-copy">
+      <video className="transition-video" src={TRANSITION_VIDEO_SRC} autoPlay muted loop playsInline preload="auto" aria-hidden="true" />
+      <div className="transition-video-veil" aria-hidden="true" />
+
+      <div className="transition-copy">
         <span className="eyebrow">{variant === 'entry' ? '星圖過場' : '完整閱讀'}</span>
         <h1>{title}</h1>
         <p>{lead}</p>

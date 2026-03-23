@@ -12,6 +12,12 @@
   color: var(--text-ink);
 }
 
+.page-shell--transition {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
 .site-topbar {
   display: flex;
   align-items: center;
@@ -543,6 +549,12 @@
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+.page-shell--transition .transition-view {
+  min-height: 100vh;
+  border-radius: 0;
+  border: 0;
+}
+
 .transition-view--entry {
   background: radial-gradient(circle at center, rgba(12, 18, 30, 0.88), rgba(4, 8, 14, 0.98));
 }
@@ -553,12 +565,39 @@
     #fcfaf4;
 }
 
+.transition-video,
+.transition-video-veil {
+  position: absolute;
+  inset: 0;
+}
+
+.transition-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.transition-video-veil {
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(7, 17, 26, 0.34), rgba(4, 9, 16, 0.58)),
+    radial-gradient(circle at center, rgba(244, 216, 163, 0.12), transparent 42%);
+}
+
+.transition-view--premium .transition-video-veil {
+  background:
+    linear-gradient(180deg, rgba(7, 17, 26, 0.42), rgba(4, 9, 16, 0.62)),
+    radial-gradient(circle at center, rgba(140, 176, 217, 0.12), transparent 44%);
+}
+
 .transition-copy {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   justify-items: center;
   text-align: center;
   max-width: 44rem;
+  padding: 0 24px;
 }
 
 .transition-copy h1 {
@@ -568,19 +607,20 @@
 }
 
 .transition-copy p {
-  color: var(--text-soft);
+  color: rgba(246, 239, 231, 0.82);
 }
 
 .transition-view--premium .transition-copy h1,
 .transition-view--premium .transition-copy p,
 .transition-view--premium .transition-copy small {
-  color: rgba(20, 21, 27, 0.82);
+  color: var(--text-strong);
 }
 
 .interactive-scene {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  z-index: 2;
 }
 
 .scene-halo,
@@ -1351,6 +1391,11 @@
     border-radius: 28px;
   }
 
+  .page-shell--transition .transition-view {
+    min-height: 100vh;
+    border-radius: 0;
+  }
+
   .premium-shell {
     width: min(100% - 20px, 1180px);
   }
@@ -1379,5 +1424,9 @@
   .landing-signal {
     animation: none !important;
     transition: none !important;
+  }
+
+  .transition-video {
+    display: none;
   }
 }

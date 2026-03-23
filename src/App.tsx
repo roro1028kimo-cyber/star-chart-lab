@@ -12,11 +12,19 @@ function App() {
   const prefersReducedMotion = useMotionPreference()
   const experience = useChartExperience({ prefersReducedMotion })
   const today = getTaiwanToday()
+  const isTransitionView = experience.view === 'entry-transition' || experience.view === 'premium-transition'
 
   const showTopbar = experience.view === 'story' || experience.view === 'premium'
+  const shellClassName = [
+    'page-shell',
+    experience.view === 'premium' ? 'page-shell--light' : '',
+    isTransitionView ? 'page-shell--transition' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   return (
-    <div className={`page-shell ${experience.view === 'premium' ? 'page-shell--light' : ''}`}>
+    <div className={shellClassName}>
       {showTopbar && <Topbar />}
 
       {experience.view === 'landing' && (
