@@ -942,3 +942,40 @@
 
 ## 下一步
 - 建立 commit，推上 GitHub。
+# 2026-03-23 19:34:00
+
+## 本次任務
+- 進入第三段工程，把 forecast 做成可查詢的歷史版本，並補上 server 端的自動排程骨架。
+## 需求理解
+- 哥哥確認直接進第三段，沿用先前規劃：`今年預測 / 本周運勢` 不再只是單次結果，要能查歷史，也要開始具備自動補產能力。
+- 不可碰萬年曆與星盤演算法，只處理 forecast 周邊工程。
+## 計畫
+- 先盤點 `ForecastReport`、`ForecastJob`、現有 forecast API 與前端 hook。
+- 補歷史查詢 API 與前端顯示。
+- 補 scheduler 啟動點與 job 執行器。
+- 跑 `lint`、`build` 驗證。
+## 哥哥確認
+- 哥哥回覆「好，第三段」後開始執行。
+## 實際執行
+- 重寫 [server/services/forecast.ts](C:/codex/star-chart-lab/server/services/forecast.ts)，補上：
+  - `getForecastHistory(...)`
+  - `runDueForecastJobs(...)`
+  - job payload / chart fingerprint / next weekly & yearly schedule 計算
+  - 生成後自動確保下一輪 `ForecastJob` 存在
+- 新增 [server/services/forecastScheduler.ts](C:/codex/star-chart-lab/server/services/forecastScheduler.ts)，以 interval 方式定期檢查到期 job。
+- 重寫 [server/index.ts](C:/codex/star-chart-lab/server/index.ts)，新增：
+  - `POST /api/forecasts/yearly/history`
+  - `POST /api/forecasts/weekly/history`
+  - health 回傳 scheduler 狀態
+  - server 啟動時自動啟 scheduler
+- 更新 [server/config.ts](C:/codex/star-chart-lab/server/config.ts) 與 [.env.example](C:/codex/star-chart-lab/.env.example)，補 `FORECAST_SCHEDULER_ENABLED`、`FORECAST_SCHEDULER_INTERVAL_MS`。
+- 重寫 [src/hooks/useChartExperience.ts](C:/codex/star-chart-lab/src/hooks/useChartExperience.ts)、[src/components/DashboardView.tsx](C:/codex/star-chart-lab/src/components/DashboardView.tsx)、[src/App.tsx](C:/codex/star-chart-lab/src/App.tsx)、[src/App.css](C:/codex/star-chart-lab/src/App.css)、[src/types.ts](C:/codex/star-chart-lab/src/types.ts)，讓年度 / 週運除了即時版本，也能顯示歷史紀錄。
+## 遇到的問題
+- Prisma 的 `Json` 欄位在寫入 `ForecastJob.payload` 時，`NatalChartResult` 不能直接當成 `InputJsonValue`，需要在寫入點明確轉型。
+## 驗證結果
+- `npm run lint` 通過
+- `npm run build` 通過
+## 目前狀態
+- 第三段工程已完成到「歷史查詢 + 排程骨架 + 前端歷史區塊」。
+## 下一步
+- 若哥哥要進第四段，可以接著做 job 監看、失敗重試策略、歷史版本切換詳讀，或把 scheduler 狀態做進管理頁。

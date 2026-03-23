@@ -5,7 +5,8 @@ import { z } from 'zod'
 import { config, getPreferredAiProvider } from './config.js'
 import { prisma } from './lib/prisma.js'
 import { generateAiAdvice } from './services/ai.js'
-import { getOrGenerateForecast } from './services/forecast.js'
+import { getForecastHistory, getOrGenerateForecast } from './services/forecast.js'
+import { startForecastScheduler } from './services/forecastScheduler.js'
 import { searchPlaces } from './services/places.js'
 import { calculateNatalChart } from './services/thoth.js'
 
@@ -31,6 +32,12 @@ const forecastRequestSchema = z.object({
   force: z.boolean().optional(),
 })
 
+const forecastHistoryRequestSchema = z.object({
+  chart: z.any(),
+  locale: z.string().optional(),
+  limit: z.number().int().min(1).max(12).optional(),
+})
+
 app.use(cors())
 app.use(express.json({ limit: '1mb' }))
 
@@ -44,7 +51,7 @@ app.get('/api/health', async (_request, response) => {
       await prisma.$queryRaw`SELECT 1`
       databaseConnected = true
     } catch (error) {
-      databaseError = error instanceof Error ? error.message : '資料庫檢查失敗。'
+      databaseError = error instanceof Error ? error.message : '資料庫連線檢查失敗。'
     }
   }
 
@@ -55,6 +62,8 @@ app.get('/api/health', async (_request, response) => {
     databaseConfigured,
     databaseConnected,
     databaseError,
+    forecastSchedulerEnabled: config.forecastSchedulerEnabled,
+    forecastSchedulerIntervalMs: config.forecastSchedulerIntervalMs,
   })
 })
 
@@ -71,7 +80,7 @@ app.get('/api/places/search', async (request, response) => {
     response.json(suggestions)
   } catch (error) {
     response.status(500).json({
-      error: error instanceof Error ? error.message : '地點搜尋暫時失敗。',
+      error: error instanceof Error ? error.message : '地點搜尋暫時沒有回應。',
     })
   }
 })
@@ -92,7 +101,7 @@ app.post('/api/charts/natal', async (request, response) => {
     response.json(result)
   } catch (error) {
     response.status(500).json({
-      error: error instanceof Error ? error.message : '命盤生成失敗。',
+      error: error instanceof Error ? error.message : '星盤計算失敗。',
     })
   }
 })
@@ -102,14 +111,14 @@ app.post('/api/insights/ai', async (request, response) => {
 
   if (!parsed.success) {
     response.status(400).json({
-      error: 'AI 分析請求格式不正確。',
+      error: 'AI 解讀請求格式不正確。',
     })
     return
   }
 
   if (!getPreferredAiProvider()) {
     response.status(503).json({
-      error: '目前尚未設定 AI API 金鑰，請先補上 .env 後再啟用 AI 分析。',
+      error: '尚未設定可用的 AI provider，請先確認 .env。',
     })
     return
   }
@@ -122,7 +131,7 @@ app.post('/api/insights/ai', async (request, response) => {
     })
   } catch (error) {
     response.status(500).json({
-      error: error instanceof Error ? error.message : 'AI 分析暫時失敗。',
+      error: error instanceof Error ? error.message : 'AI 解讀失敗。',
     })
   }
 })
@@ -157,7 +166,33 @@ app.post('/api/forecasts/yearly', async (request, response) => {
     response.json(result)
   } catch (error) {
     response.status(500).json({
-      error: error instanceof Error ? error.message : '年度預測暫時失敗。',
+      error: error instanceof Error ? error.message : '年度預測生成失敗。',
+    })
+  }
+})
+
+app.post('/api/forecasts/yearly/history', async (request, response) => {
+  const parsed = forecastHistoryRequestSchema.safeParse(request.body)
+
+  if (!parsed.success) {
+    response.status(400).json({
+      error: '年度預測歷史查詢格式不正確。',
+    })
+    return
+  }
+
+  try {
+    const result = await getForecastHistory({
+      chart: parsed.data.chart,
+      kind: 'yearly',
+      locale: parsed.data.locale || 'zh-TW',
+      limit: parsed.data.limit,
+    })
+
+    response.json(result)
+  } catch (error) {
+    response.status(500).json({
+      error: error instanceof Error ? error.message : '年度預測歷史查詢失敗。',
     })
   }
 })
@@ -167,7 +202,7 @@ app.post('/api/forecasts/weekly', async (request, response) => {
 
   if (!parsed.success) {
     response.status(400).json({
-      error: '本周運勢請求格式不正確。',
+      error: '本週運勢請求格式不正確。',
     })
     return
   }
@@ -183,7 +218,33 @@ app.post('/api/forecasts/weekly', async (request, response) => {
     response.json(result)
   } catch (error) {
     response.status(500).json({
-      error: error instanceof Error ? error.message : '本周運勢暫時失敗。',
+      error: error instanceof Error ? error.message : '本週運勢生成失敗。',
+    })
+  }
+})
+
+app.post('/api/forecasts/weekly/history', async (request, response) => {
+  const parsed = forecastHistoryRequestSchema.safeParse(request.body)
+
+  if (!parsed.success) {
+    response.status(400).json({
+      error: '本週運勢歷史查詢格式不正確。',
+    })
+    return
+  }
+
+  try {
+    const result = await getForecastHistory({
+      chart: parsed.data.chart,
+      kind: 'weekly',
+      locale: parsed.data.locale || 'zh-TW',
+      limit: parsed.data.limit,
+    })
+
+    response.json(result)
+  } catch (error) {
+    response.status(500).json({
+      error: error instanceof Error ? error.message : '本週運勢歷史查詢失敗。',
     })
   }
 })
@@ -195,6 +256,8 @@ if (process.env.NODE_ENV === 'production') {
     response.sendFile(path.join(distPath, 'index.html'))
   })
 }
+
+startForecastScheduler()
 
 app.listen(config.port, () => {
   console.log(`Star Chart Lab server listening on http://localhost:${config.port}`)

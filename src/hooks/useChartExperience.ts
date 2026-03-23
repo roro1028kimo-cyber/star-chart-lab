@@ -1,6 +1,12 @@
 import { startTransition, useCallback, useDeferredValue, useEffect, useState, type FormEvent } from 'react'
 import { APP_COPY } from '../content'
-import type { DashboardSection, ForecastResponse, NatalChartResult, PlaceSuggestion } from '../types'
+import type {
+  DashboardSection,
+  ForecastHistoryEntry,
+  ForecastResponse,
+  NatalChartResult,
+  PlaceSuggestion,
+} from '../types'
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
 const MIN_LOADING_MS = 1200
@@ -43,6 +49,12 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
   const [weeklyForecastLoading, setWeeklyForecastLoading] = useState(false)
   const [yearlyForecastError, setYearlyForecastError] = useState<string | null>(null)
   const [weeklyForecastError, setWeeklyForecastError] = useState<string | null>(null)
+  const [yearlyHistory, setYearlyHistory] = useState<ForecastHistoryEntry[]>([])
+  const [weeklyHistory, setWeeklyHistory] = useState<ForecastHistoryEntry[]>([])
+  const [yearlyHistoryLoading, setYearlyHistoryLoading] = useState(false)
+  const [weeklyHistoryLoading, setWeeklyHistoryLoading] = useState(false)
+  const [yearlyHistoryError, setYearlyHistoryError] = useState<string | null>(null)
+  const [weeklyHistoryError, setWeeklyHistoryError] = useState<string | null>(null)
 
   const deferredQuery = useDeferredValue(placeQuery)
 
@@ -131,43 +143,88 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
     setPlaceError(null)
   }
 
-  const loadForecast = useCallback(async (kind: 'yearly' | 'weekly', force = false) => {
-    if (!chart) {
-      return
-    }
-
-    const setLoading = kind === 'yearly' ? setYearlyForecastLoading : setWeeklyForecastLoading
-    const setError = kind === 'yearly' ? setYearlyForecastError : setWeeklyForecastError
-    const setData = kind === 'yearly' ? setYearlyForecast : setWeeklyForecast
-
-    setLoading(true)
-    setError(null)
-
-    try {
-      const response = await fetch(toApiUrl(`/api/forecasts/${kind}`), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          chart,
-          locale: 'zh-TW',
-          force,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error(await readError(response))
+  const loadForecastHistory = useCallback(
+    async (kind: 'yearly' | 'weekly') => {
+      if (!chart) {
+        return
       }
 
-      const payload = (await response.json()) as ForecastResponse
-      setData(payload)
-    } catch (error) {
-      setError(error instanceof Error ? error.message : `${kind} forecast failed`)
-    } finally {
-      setLoading(false)
-    }
-  }, [chart])
+      const setLoading = kind === 'yearly' ? setYearlyHistoryLoading : setWeeklyHistoryLoading
+      const setError = kind === 'yearly' ? setYearlyHistoryError : setWeeklyHistoryError
+      const setData = kind === 'yearly' ? setYearlyHistory : setWeeklyHistory
+
+      setLoading(true)
+      setError(null)
+
+      try {
+        const response = await fetch(toApiUrl(`/api/forecasts/${kind}/history`), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chart,
+            locale: 'zh-TW',
+            limit: 6,
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error(await readError(response))
+        }
+
+        const payload = (await response.json()) as ForecastHistoryEntry[]
+        setData(payload)
+      } catch (error) {
+        setError(error instanceof Error ? error.message : `${kind} history failed`)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [chart],
+  )
+
+  const loadForecast = useCallback(
+    async (kind: 'yearly' | 'weekly', force = false) => {
+      if (!chart) {
+        return
+      }
+
+      const setLoading = kind === 'yearly' ? setYearlyForecastLoading : setWeeklyForecastLoading
+      const setError = kind === 'yearly' ? setYearlyForecastError : setWeeklyForecastError
+      const setData = kind === 'yearly' ? setYearlyForecast : setWeeklyForecast
+
+      setLoading(true)
+      setError(null)
+
+      try {
+        const response = await fetch(toApiUrl(`/api/forecasts/${kind}`), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chart,
+            locale: 'zh-TW',
+            force,
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error(await readError(response))
+        }
+
+        const payload = (await response.json()) as ForecastResponse
+        setData(payload)
+        await loadForecastHistory(kind)
+      } catch (error) {
+        setError(error instanceof Error ? error.message : `${kind} forecast failed`)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [chart, loadForecastHistory],
+  )
 
   useEffect(() => {
     if (!chart || view === 'landing' || view === 'entry-transition') {
@@ -176,14 +233,19 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
 
     if (!yearlyForecast && !yearlyForecastLoading && !yearlyForecastError) {
       void loadForecast('yearly')
+    } else if (!yearlyHistory.length && !yearlyHistoryLoading && !yearlyHistoryError) {
+      void loadForecastHistory('yearly')
     }
 
     if (!weeklyForecast && !weeklyForecastLoading && !weeklyForecastError) {
       void loadForecast('weekly')
+    } else if (!weeklyHistory.length && !weeklyHistoryLoading && !weeklyHistoryError) {
+      void loadForecastHistory('weekly')
     }
   }, [
     chart,
     loadForecast,
+    loadForecastHistory,
     view,
     yearlyForecast,
     weeklyForecast,
@@ -191,6 +253,12 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
     weeklyForecastLoading,
     yearlyForecastError,
     weeklyForecastError,
+    yearlyHistory,
+    weeklyHistory,
+    yearlyHistoryLoading,
+    weeklyHistoryLoading,
+    yearlyHistoryError,
+    weeklyHistoryError,
   ])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -244,6 +312,10 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
         setWeeklyForecast(null)
         setYearlyForecastError(null)
         setWeeklyForecastError(null)
+        setYearlyHistory([])
+        setWeeklyHistory([])
+        setYearlyHistoryError(null)
+        setWeeklyHistoryError(null)
         setView('entry-transition')
       })
     } catch (error) {
@@ -305,12 +377,6 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
     placeQuery,
     placeResults,
     resetToLanding,
-    weeklyForecast,
-    weeklyForecastError,
-    weeklyForecastLoading,
-    yearlyForecast,
-    yearlyForecastError,
-    yearlyForecastLoading,
     retryWeeklyForecast: () => loadForecast('weekly', true),
     retryYearlyForecast: () => loadForecast('yearly', true),
     selectPlace,
@@ -321,5 +387,17 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
     time,
     view,
     vipUnlocked,
+    weeklyForecast,
+    weeklyForecastError,
+    weeklyForecastLoading,
+    weeklyHistory,
+    weeklyHistoryError,
+    weeklyHistoryLoading,
+    yearlyForecast,
+    yearlyForecastError,
+    yearlyForecastLoading,
+    yearlyHistory,
+    yearlyHistoryError,
+    yearlyHistoryLoading,
   }
 }

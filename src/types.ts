@@ -44,6 +44,19 @@ export interface InterpretationBlock {
 
 export type DashboardSection = 'yearly' | 'weekly' | 'houses' | 'settings' | 'vip'
 
+export interface ForecastHistoryEntry {
+  id: string
+  kind: 'yearly' | 'weekly'
+  periodKey: string
+  title: string
+  summary: string
+  body: string
+  bullets: string[]
+  generatedAt: string
+  availableAt: string | null
+  source: 'openai' | 'gemini'
+}
+
 export interface ForecastResponse {
   kind: 'yearly' | 'weekly'
   periodKey: string

@@ -65,9 +65,15 @@ function App() {
           weeklyForecast={experience.weeklyForecast}
           weeklyForecastError={experience.weeklyForecastError}
           weeklyForecastLoading={experience.weeklyForecastLoading}
+          weeklyHistory={experience.weeklyHistory}
+          weeklyHistoryError={experience.weeklyHistoryError}
+          weeklyHistoryLoading={experience.weeklyHistoryLoading}
           yearlyForecast={experience.yearlyForecast}
           yearlyForecastError={experience.yearlyForecastError}
           yearlyForecastLoading={experience.yearlyForecastLoading}
+          yearlyHistory={experience.yearlyHistory}
+          yearlyHistoryError={experience.yearlyHistoryError}
+          yearlyHistoryLoading={experience.yearlyHistoryLoading}
         />
       )}
 

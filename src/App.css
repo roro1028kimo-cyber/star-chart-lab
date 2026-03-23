@@ -1270,6 +1270,63 @@
   color: var(--text-muted);
 }
 
+.forecast-history {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.forecast-history__title {
+  display: grid;
+  gap: 6px;
+}
+
+.forecast-history__title strong {
+  color: var(--text-strong);
+  font-size: 1rem;
+}
+
+.forecast-history__title span,
+.forecast-history__empty,
+.forecast-history__card p,
+.forecast-history__card small {
+  color: var(--text-muted);
+}
+
+.forecast-history__list {
+  display: grid;
+  gap: 12px;
+}
+
+.forecast-history__card {
+  display: grid;
+  gap: 10px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.forecast-history__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.forecast-history__head strong {
+  color: var(--text-strong);
+}
+
+.forecast-history__head span {
+  color: var(--text-soft);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .house-impact-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

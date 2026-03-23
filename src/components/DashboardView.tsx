@@ -7,7 +7,7 @@ import {
   getTaiwanWeekRangeLabel,
   getTaiwanYear,
 } from '../content'
-import type { DashboardSection, ForecastResponse, NatalChartResult } from '../types'
+import type { DashboardSection, ForecastHistoryEntry, ForecastResponse, NatalChartResult } from '../types'
 import { ChartWheel } from './ChartWheel'
 import { PlacementTable } from './PlacementTable'
 
@@ -21,10 +21,10 @@ function buildHouseCards(chart: NatalChartResult) {
 
     return {
       key: house.number,
-      title: `${house.number}宮`,
+      title: `第 ${house.number} 宮`,
       sign: house.signLabel,
       degree: formatPlacementDegree(house.formattedDegree, house.degree),
-      occupants: occupants.length > 0 ? occupants.map((planet) => planet.label).join('、') : '目前沒有主要星體落入',
+      occupants: occupants.length > 0 ? occupants.map((planet) => planet.label).join('、') : '目前沒有主要星體落在這一宮',
     }
   })
 }
@@ -49,9 +49,50 @@ function buildSummaryItems(chart: NatalChartResult) {
     {
       label: APP_COPY.summaryLabels.dominant,
       value: `${getElementDisplay(chart.summary.dominantElement)} / ${getModalityDisplay(chart.summary.dominantModality)}`,
-      meta: `${chart.summary.dominantElementCount} 顆偏向此元素 · ${chart.summary.dominantModalityCount} 顆偏向此模式`,
+      meta: `${chart.summary.dominantElementCount} 顆偏向主元素 · ${chart.summary.dominantModalityCount} 顆偏向主模式`,
     },
   ]
+}
+
+function renderHistoryBlock({
+  history,
+  loading,
+  error,
+  emptyLabel,
+}: {
+  history: ForecastHistoryEntry[]
+  loading: boolean
+  error: string | null
+  emptyLabel: string
+}) {
+  if (loading) {
+    return <p className="forecast-history__empty">正在整理你先前的版本紀錄…</p>
+  }
+
+  if (error) {
+    return <p className="forecast-history__empty">{error}</p>
+  }
+
+  if (history.length === 0) {
+    return <p className="forecast-history__empty">{emptyLabel}</p>
+  }
+
+  return (
+    <div className="forecast-history__list">
+      {history.map((entry) => (
+        <article key={entry.id} className="forecast-history__card">
+          <div className="forecast-history__head">
+            <strong>{entry.title}</strong>
+            <span>{entry.periodKey}</span>
+          </div>
+          <p>{entry.summary}</p>
+          <small>
+            {new Date(entry.generatedAt).toLocaleString('zh-TW')} · {entry.source}
+          </small>
+        </article>
+      ))}
+    </div>
+  )
 }
 
 export function DashboardView({
@@ -67,9 +108,15 @@ export function DashboardView({
   weeklyForecast,
   weeklyForecastError,
   weeklyForecastLoading,
+  weeklyHistory,
+  weeklyHistoryError,
+  weeklyHistoryLoading,
   yearlyForecast,
   yearlyForecastError,
   yearlyForecastLoading,
+  yearlyHistory,
+  yearlyHistoryError,
+  yearlyHistoryLoading,
 }: {
   activeSection: DashboardSection
   chart: NatalChartResult
@@ -83,9 +130,15 @@ export function DashboardView({
   weeklyForecast: ForecastResponse | null
   weeklyForecastError: string | null
   weeklyForecastLoading: boolean
+  weeklyHistory: ForecastHistoryEntry[]
+  weeklyHistoryError: string | null
+  weeklyHistoryLoading: boolean
   yearlyForecast: ForecastResponse | null
   yearlyForecastError: string | null
   yearlyForecastLoading: boolean
+  yearlyHistory: ForecastHistoryEntry[]
+  yearlyHistoryError: string | null
+  yearlyHistoryLoading: boolean
 }) {
   const currentYear = getTaiwanYear()
   const weekRange = getTaiwanWeekRangeLabel()
@@ -111,7 +164,7 @@ export function DashboardView({
       return (
         <div className="dashboard-copy-block">
           <p>{lead}</p>
-          <p>正在向後端安全代理請求內容，API key 只會留在 server 端，不會進到前端。</p>
+          <p>系統正在透過安全的 server API 生成內容，金鑰不會落在前端。</p>
         </div>
       )
     }
@@ -151,7 +204,8 @@ export function DashboardView({
         </div>
 
         <small className="dashboard-meta-note">
-          生成時間：{forecast.generatedAt} · 來源：{forecast.source} · {forecast.stored ? '已記錄資料庫' : '目前尚未寫入資料庫'}
+          生成時間：{new Date(forecast.generatedAt).toLocaleString('zh-TW')} · 來源：{forecast.source} ·
+          {forecast.stored ? ' 已寫入資料庫' : ' 尚未寫入資料庫'}
         </small>
       </>
     )
@@ -161,38 +215,38 @@ export function DashboardView({
     {
       kind: 'section',
       key: 'yearly',
-      label: `${currentYear}今年預測`,
-      hint: '每年自動更新並寫入資料庫',
+      label: `${currentYear} 今年預測`,
+      hint: '每年生成一次，並保留資料庫紀錄',
     },
     {
       kind: 'section',
       key: 'weekly',
-      label: `本周(${weekRange})運勢分析`,
-      hint: '每週自動更新並寫入資料庫',
+      label: `本週(${weekRange})運勢分析`,
+      hint: '每週更新一次，會自動補產新版本',
     },
     {
       kind: 'section',
       key: 'houses',
       label: '各宮位影響範圍',
-      hint: '看 12 宮落點與重心',
+      hint: '把 12 宮的重點一次看清楚',
     },
     {
       kind: 'section',
       key: 'settings',
       label: '個人設定',
-      hint: '出生資料與來源設定',
+      hint: '確認出生資料與系統來源',
     },
     {
       kind: 'section',
       key: 'vip',
-      label: 'VIP等級',
-      hint: vipUnlocked ? '已解鎖完整閱讀' : '可打開完整閱讀',
+      label: 'VIP 等級',
+      hint: vipUnlocked ? '已解鎖完整深度閱讀' : '還沒解鎖完整內容',
     },
     {
       kind: 'route',
       key: 'tarot',
       label: '隨機塔羅牌分析',
-      hint: '另開新的塔羅頁面',
+      hint: '切到獨立頁面體驗塔羅',
     },
   ]
 
@@ -201,9 +255,9 @@ export function DashboardView({
       return (
         <article className="dashboard-focus-card">
           <div className="card-head">
-            <span className="section-kicker">年度主題</span>
+            <span className="section-kicker">年度預測</span>
             <h2>{yearlyForecast?.title || `${currentYear} 今年預測`}</h2>
-            <p>這一區已直接走後端 API 生成，金鑰只會放在 server env，不會出現在前端。</p>
+            <p>先把你今年最值得留意的節奏抓出來，讓你一眼就知道哪裡值得用力，哪裡先別急。</p>
           </div>
 
           {renderForecastPanel({
@@ -212,8 +266,21 @@ export function DashboardView({
             loading: yearlyForecastLoading,
             onRetry: onRetryYearlyForecast,
             title: '年度預測',
-            lead: '年度預測正在生成中。',
+            lead: '年度預測正在整理中，稍後就會把重點帶到你眼前。',
           })}
+
+          <section className="forecast-history">
+            <div className="forecast-history__title">
+              <strong>歷史版本</strong>
+              <span>這張星盤曾經生成過的年度紀錄都會留在資料庫裡。</span>
+            </div>
+            {renderHistoryBlock({
+              history: yearlyHistory,
+              loading: yearlyHistoryLoading,
+              error: yearlyHistoryError,
+              emptyLabel: '目前還只有這一版，之後年度更新會在這裡累積。',
+            })}
+          </section>
         </article>
       )
     }
@@ -222,9 +289,9 @@ export function DashboardView({
       return (
         <article className="dashboard-focus-card">
           <div className="card-head">
-            <span className="section-kicker">本周焦點</span>
-            <h2>{weeklyForecast?.title || `本周(${weekRange})運勢分析`}</h2>
-            <p>這一區已直接走後端 API 生成，之後可再接每週自動排程。</p>
+            <span className="section-kicker">本週運勢</span>
+            <h2>{weeklyForecast?.title || `本週(${weekRange})運勢分析`}</h2>
+            <p>這裡不是流水帳，而是把你這週真正該注意的情緒節點、行動節奏和互動提醒抓出來。</p>
           </div>
 
           {renderForecastPanel({
@@ -232,9 +299,22 @@ export function DashboardView({
             error: weeklyForecastError,
             loading: weeklyForecastLoading,
             onRetry: onRetryWeeklyForecast,
-            title: '本周運勢',
-            lead: '本周運勢正在生成中。',
+            title: '本週運勢',
+            lead: '本週運勢正在整理中，會很快把這一週的主節奏送上來。',
           })}
+
+          <section className="forecast-history">
+            <div className="forecast-history__title">
+              <strong>歷史版本</strong>
+              <span>這裡會保留你過去幾週的版本，方便對照節奏怎麼變。</span>
+            </div>
+            {renderHistoryBlock({
+              history: weeklyHistory,
+              loading: weeklyHistoryLoading,
+              error: weeklyHistoryError,
+              emptyLabel: '目前還沒有舊週報，等下一次週期更新後就會看到。',
+            })}
+          </section>
         </article>
       )
     }
@@ -245,7 +325,7 @@ export function DashboardView({
           <div className="card-head">
             <span className="section-kicker">宮位影響</span>
             <h2>各宮位影響範圍</h2>
-            <p>先看 12 宮分佈，再往下對照星體落點。這一區會是之後做進階宮位分析的基礎。</p>
+            <p>把 12 宮當成你人生不同場景的聚光燈，哪裡比較亮、哪裡比較安靜，這裡會很直觀。</p>
           </div>
 
           <div className="house-impact-grid">
@@ -270,7 +350,7 @@ export function DashboardView({
           <div className="card-head">
             <span className="section-kicker">個人設定</span>
             <h2>個人設定</h2>
-            <p>這裡先放出生資料、資料來源與目前帳號等級的前端顯示骨架，之後再接真正的會員資料。</p>
+            <p>這裡先幫你確認資料來源，之後如果要接帳號、VIP 等級或更多偏好設定，也會從這裡延伸。</p>
           </div>
 
           <div className="settings-list">
@@ -283,7 +363,7 @@ export function DashboardView({
               <strong>{chart.input.time}</strong>
             </article>
             <article className="settings-item">
-              <span>出生地</span>
+              <span>出生地點</span>
               <strong>{chart.input.placeLabel}</strong>
             </article>
             <article className="settings-item">
@@ -291,12 +371,12 @@ export function DashboardView({
               <strong>{chart.source.engine}</strong>
             </article>
             <article className="settings-item">
-              <span>地點資料</span>
+              <span>地點來源</span>
               <strong>{chart.source.geocoding}</strong>
             </article>
             <article className="settings-item">
               <span>AI 狀態</span>
-              <strong>{chart.source.aiConfigured ? `已配置 ${chart.source.aiProvider}` : '目前未啟用'}</strong>
+              <strong>{chart.source.aiConfigured ? `已啟用 ${chart.source.aiProvider}` : '尚未啟用 AI'}</strong>
             </article>
           </div>
         </article>
@@ -306,9 +386,9 @@ export function DashboardView({
     return (
       <article className="dashboard-focus-card">
         <div className="card-head">
-          <span className="section-kicker">VIP等級</span>
+          <span className="section-kicker">VIP 等級</span>
           <h2>VIP 等級</h2>
-          <p>這裡會是完整閱讀、升級狀態與後續會員權益的主面板。</p>
+          <p>如果免費內容是在幫你打開門，完整閱讀就是把房間裡真正重要的內容一盞一盞點亮。</p>
         </div>
 
         {!vipUnlocked && (
@@ -343,7 +423,7 @@ export function DashboardView({
             <strong>{APP_COPY.brand}</strong>
           </div>
 
-          <nav className="dashboard-nav" aria-label="主功能">
+          <nav className="dashboard-nav" aria-label="Dashboard navigation">
             {sidebarItems.map((item) =>
               item.kind === 'section' ? (
                 <button
@@ -385,9 +465,9 @@ export function DashboardView({
           <div className="dashboard-stage">
             <article className="dashboard-stage__chart">
               <div className="card-head">
-                <span className="section-kicker">主工作區</span>
-                <h2>本命盤中心</h2>
-                <p>這裡先固定保留主星盤，未來再往上疊更多互動控制。</p>
+                <span className="section-kicker">命盤中心</span>
+                <h2>你的本命盤</h2>
+                <p>主舞台先把星盤本體放中間，右邊再幫你快速讀懂主元素、太陽、月亮和上升。</p>
               </div>
 
               <div className="dashboard-stage__layout">
@@ -414,7 +494,7 @@ export function DashboardView({
 
             <article className="dashboard-stage__reading">
               <div className="card-head">
-                <span className="section-kicker">短讀摘要</span>
+                <span className="section-kicker">免費短讀</span>
                 <h2>{APP_COPY.freeReadingTitle}</h2>
                 <p>{APP_COPY.freeReadingLead}</p>
               </div>
@@ -427,21 +507,21 @@ export function DashboardView({
 
         <aside className="dashboard-rail">
           <article className="dashboard-rail__card">
-            <span className="section-kicker">年度更新</span>
-            <h3>{currentYear}今年預測</h3>
-            <p>{yearlyForecast?.summary || yearlyForecastError || '等待年度預測生成中。'}</p>
+            <span className="section-kicker">年度摘要</span>
+            <h3>{currentYear} 今年預測</h3>
+            <p>{yearlyForecast?.summary || yearlyForecastError || '年度預測正在生成中。'}</p>
           </article>
 
           <article className="dashboard-rail__card">
-            <span className="section-kicker">每周更新</span>
-            <h3>本周({weekRange})</h3>
-            <p>{weeklyForecast?.summary || weeklyForecastError || '等待本周運勢生成中。'}</p>
+            <span className="section-kicker">本週摘要</span>
+            <h3>本週({weekRange})</h3>
+            <p>{weeklyForecast?.summary || weeklyForecastError || '本週運勢正在生成中。'}</p>
           </article>
 
           <article className="dashboard-rail__card">
             <span className="section-kicker">VIP 狀態</span>
-            <h3>{vipUnlocked ? '已打開完整閱讀' : '尚未打開 VIP 閱讀'}</h3>
-            <p>{vipUnlocked ? '你現在看到的是完整段落版位，後續可以接會員與權益資訊。' : chart.interpretation.premiumTeaser}</p>
+            <h3>{vipUnlocked ? '已解鎖完整閱讀' : '還沒打開 VIP'}</h3>
+            <p>{vipUnlocked ? '你現在可以直接往下看更完整、更細緻的深度段落。' : chart.interpretation.premiumTeaser}</p>
             {!vipUnlocked && (
               <button type="button" className="secondary-button" onClick={onOpenPremium}>
                 {APP_COPY.unlockButton}
@@ -450,10 +530,10 @@ export function DashboardView({
           </article>
 
           <article className="dashboard-rail__card">
-            <span className="section-kicker">目前星盤</span>
+            <span className="section-kicker">命盤輪廓</span>
             <h3>{chart.summary.ascendant.signLabel} 上升</h3>
             <p>
-              太陽 {chart.summary.sun.signLabel} · 月亮 {chart.summary.moon.signLabel} · 主能量{' '}
+              太陽 {chart.summary.sun.signLabel} · 月亮 {chart.summary.moon.signLabel} · 主元素{' '}
               {getElementDisplay(chart.summary.dominantElement)}
             </p>
           </article>

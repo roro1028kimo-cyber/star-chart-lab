@@ -14,6 +14,8 @@ export const config = {
   geminiModel: trim(process.env.GEMINI_MODEL) || 'gemini-2.5-pro',
   emailDeliveryApiUrl: trim(process.env.EMAIL_DELIVERY_API_URL),
   emailDeliveryApiKey: trim(process.env.EMAIL_DELIVERY_API_KEY),
+  forecastSchedulerEnabled: trim(process.env.FORECAST_SCHEDULER_ENABLED)?.toLowerCase() !== 'false',
+  forecastSchedulerIntervalMs: Math.max(Number(process.env.FORECAST_SCHEDULER_INTERVAL_MS || 300000), 60000),
 }
 
 export function getPreferredAiProvider() {
