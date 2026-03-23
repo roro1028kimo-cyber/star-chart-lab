@@ -19,12 +19,35 @@ function toApiUrl(path: string) {
   return API_BASE ? `${API_BASE}${path}` : path
 }
 
+function buildNonJsonApiMessage() {
+  return 'API 目前回傳的不是 JSON，請確認前端是否連到正確的後端服務，或檢查 VITE_API_BASE_URL / /api 代理設定。'
+}
+
 async function readError(response: Response) {
   try {
     const payload = (await response.json()) as { error?: string }
     return payload.error || 'Request failed.'
   } catch {
     return 'Request failed.'
+  }
+}
+
+async function readJson<T>(response: Response) {
+  const contentType = response.headers.get('content-type') || ''
+  const raw = await response.text()
+
+  if (!contentType.includes('application/json')) {
+    if (raw.trim().startsWith('<!doctype') || raw.trim().startsWith('<html')) {
+      throw new Error(buildNonJsonApiMessage())
+    }
+
+    throw new Error('API 回應格式異常，請稍後再試一次。')
+  }
+
+  try {
+    return JSON.parse(raw) as T
+  } catch {
+    throw new Error('API JSON 解析失敗，請確認後端回傳格式。')
   }
 }
 
@@ -87,7 +110,7 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
           throw new Error(message === 'Request failed.' ? APP_COPY.placeSearchError : message)
         }
 
-        const payload = (await response.json()) as PlaceSuggestion[]
+        const payload = await readJson<PlaceSuggestion[]>(response)
         setPlaceResults(payload)
 
         if (payload.length === 0) {
@@ -173,7 +196,7 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
           throw new Error(await readError(response))
         }
 
-        const payload = (await response.json()) as ForecastHistoryEntry[]
+        const payload = await readJson<ForecastHistoryEntry[]>(response)
         setData(payload)
       } catch (error) {
         setError(error instanceof Error ? error.message : `${kind} history failed`)
@@ -214,7 +237,7 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
           throw new Error(await readError(response))
         }
 
-        const payload = (await response.json()) as ForecastResponse
+        const payload = await readJson<ForecastResponse>(response)
         setData(payload)
         await loadForecastHistory(kind)
       } catch (error) {
@@ -296,7 +319,7 @@ export function useChartExperience({ prefersReducedMotion }: { prefersReducedMot
         throw new Error(await readError(response))
       }
 
-      const payload = (await response.json()) as NatalChartResult
+      const payload = await readJson<NatalChartResult>(response)
       const remainingDelay = Math.max(MIN_LOADING_MS - (Date.now() - requestStartedAt), 0)
 
       if (remainingDelay > 0) {

@@ -942,6 +942,35 @@
 
 ## 下一步
 - 建立 commit，推上 GitHub。
+# 2026-03-23 19:46:00
+
+## 本次任務
+- 處理首頁出生地搜尋時出現 `Unexpected token '<'` 的錯誤顯示，直接修正前端 API 解析位置。
+## 需求理解
+- 哥哥貼的畫面顯示 place search 時收到 HTML 卻被當 JSON 解析，使用者不應該看到原始 token 錯誤。
+- 這一輪優先修正錯誤呈現與 API 解析保護，不擴大到版型或演算法。
+## 計畫
+- 檢查 Vite proxy、place search fetch 與回應解析邏輯。
+- 補強前端 JSON 解析，遇到 HTML 時改成可理解訊息。
+- 跑 `lint`、`build`，並實測 `/api/places/search?q=台北`。
+## 哥哥確認
+- 哥哥直接提供錯誤畫面，希望我處理錯誤位置。
+## 實際執行
+- 檢查 [vite.config.ts](C:/codex/star-chart-lab/vite.config.ts) 後確認 `server.proxy['/api']` 已存在。
+- 檢查 [src/hooks/useChartExperience.ts](C:/codex/star-chart-lab/src/hooks/useChartExperience.ts) 後確認原本直接呼叫 `response.json()`，因此遇到 HTML 會把 parse error 直接丟到畫面。
+- 在 [src/hooks/useChartExperience.ts](C:/codex/star-chart-lab/src/hooks/useChartExperience.ts) 新增 `readJson<T>()`，先檢查 `content-type`，若回應不是 JSON 且內容像 HTML，就改丟出「請確認前端是否連到正確後端服務」的友善訊息。
+- place search、forecast、natal chart 讀取都改走同一層安全 JSON 解析。
+- 另外用本機直接驗證：
+  - `http://localhost:8787/api/health` 正常
+  - `http://localhost:8200/api/places/search?q=台北` 正常回 `application/json`
+## 驗證結果
+- `npm run lint` 通過
+- `npm run build` 通過
+## 目前狀態
+- 原本會顯示 raw JSON parse error 的位置已修正；若 API 再次回到 HTML，畫面會改成可讀錯誤提示。
+## 下一步
+- 若哥哥那邊 refresh 後還是出現同樣問題，就要往部署環境的 `VITE_API_BASE_URL` 或反向代理設定繼續追。
+
 # 2026-03-23 19:34:00
 
 ## 本次任務
